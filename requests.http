@@ -1,0 +1,35 @@
+### Variables
+@baseUrl = http://localhost:3000/api/auth
+
+### 1. Registrar Paciente
+POST {{baseUrl}}/register
+Content-Type: application/json
+
+{
+  "correo": "juan.perez@example.com",
+  "contrasena": "secreta123",
+  "nombres": "Juan",
+  "apellidos": "Perez",
+  "telefono": "987654321",
+  "DNI": "12345678",
+  "fecha_nacimiento": "1990-01-01",
+  "contacto_telefono": "912345678",
+  "contacto_correo": "contacto@example.com",
+  "contacto_nombres": "Maria",
+  "contacto_apellidos": "Perez",
+  "contacto_parentesco": "Madre"
+}
+
+### 2. Iniciar Sesión (Login)
+# @name loginRequest
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "correo": "juan.perez@example.com",
+  "contrasena": "secreta123"
+}
+
+### 3. Obtener Perfil (Ejemplo con Token)
+GET http://localhost:3000/api/perfil
+Authorization: Bearer {{loginRequest.response.body.token}}

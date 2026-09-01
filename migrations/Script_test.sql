@@ -1,3 +1,4 @@
+USE CitasMedicasJYP;
 -- 1. Tabla Usuario
 INSERT INTO Usuario (contrasena, nombres, apellidos, correo, telefono, rol) VALUES ('pass123', 'Carlos', 'Gomez', 'carlos.gomez@mail.com', '987654321', 'Paciente');
 INSERT INTO Usuario (contrasena, nombres, apellidos, correo, telefono, rol) VALUES ('pass123', 'Ana', 'Torres', 'ana.torres@mail.com', '987654322', 'Paciente');
