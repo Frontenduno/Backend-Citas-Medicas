@@ -1,17 +1,17 @@
-const DBConexion = require("../../../src/configuration/DBConexion");
+const DBConexion = require("../../../src/infrastructure/database/PoolConexion");
 
 describe("Test de la conexion a la base de datos", () => {
   test("Debe conectarse a la base de datos", async () => {
-    const connection = DBConexion.getConnection();
+    const conexion = await DBConexion.getConnection();
 
     try {
-      const [rows] = await connection.execute(
-        "SELECT 'Conexion Existosa' as result",
+      const [rows] = await conexion.execute(
+        "SELECT 'Conexion Exitosa' as result",
       );
 
       expect(rows[0].result).toBe("Conexion Exitosa");
     } finally {
-      DBConexion.returnConnection();
+      conexion.release();
     }
   });
 });
