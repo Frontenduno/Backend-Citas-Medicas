@@ -1,5 +1,7 @@
-const repository = require("../../../src/infrastructure/repositories/UserRepository");
-const { closeConnection } = require("../../../src/infrastructure/database/PoolConexion");
+const repository = require("../../../src/infrastructure/repositories/UserRepositoryMySQL");
+const {
+  closeConnection,
+} = require("../../../src/infrastructure/database/PoolConexion");
 
 describe("Test de los metodos de repository", () => {
   afterAll(async () => {
@@ -12,15 +14,13 @@ describe("Test de los metodos de repository", () => {
   });
 
   test("El email ingresado debe existir en la base de datos", async () => {
-    const result = await repository.existsByEmail("mgomez@citasmedicas.com");
+    const result = await repository.existsByEmail("luis.ramirez@mail.com");
     expect(result).toBe(true);
   });
 
   test("Debe retornar un usuario", async () => {
-    const result = await repository.findUsuariobyEmail(
-      "luis.infantes@email.com",
-    );
-    expect(result.nombres).toBe("Luis Ricardo");
+    const result = await repository.findUsuariobyEmail("luis.ramirez@mail.com");
+    expect(result.nombres).toBe("Luis");
   });
 
   test("Debe ser nulo", async () => {

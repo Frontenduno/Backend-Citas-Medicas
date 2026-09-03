@@ -1,9 +1,15 @@
 const request = require("supertest");
-const express = require("express");
 const authRoutes = require("../../../src/presenter/routes/authRoutes");
 const {
   closeConnection,
 } = require("../../../src/infrastructure/database/PoolConexion");
+
+const express = require("express");
+const app = express();
+
+app.use(express.json());
+
+app.use("/auth", authRoutes);
 
 describe("Pruebas de Integración para Endpoints de Autenticación (Auth)", () => {
   // Usamos Date.now() para generar correos únicos y evitar error de 'Correo ya registrado'
