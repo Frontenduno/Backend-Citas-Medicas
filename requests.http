@@ -12,12 +12,7 @@ Content-Type: application/json
   "apellidos": "Perez",
   "telefono": "987654321",
   "DNI": "12345678",
-  "fecha_nacimiento": "1990-01-01",
-  "contacto_telefono": "912345678",
-  "contacto_correo": "contacto@example.com",
-  "contacto_nombres": "Maria",
-  "contacto_apellidos": "Perez",
-  "contacto_parentesco": "Madre"
+  "fecha_nacimiento": "1990-01-01"
 }
 
 ### 2. Iniciar Sesión (Login)

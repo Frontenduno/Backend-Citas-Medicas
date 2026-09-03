@@ -1,12 +1,14 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const AuthRepositoryMySQL = require("../../infrastructure/repositories/AuthRepositoryMySQL");
+const AuthRepositoryMySQL = require("../../../infrastructure/repositories/AuthRepositoryMySQL");
 
 const JWT_SECRET = process.env.JWT_SECRET || "secreto_super_seguro_123";
 
 async function registerPaciente(pacienteData) {
   // 1. Validar si el correo ya existe
-  const userExists = await AuthRepositoryMySQL.findUsuarioByCorreo(pacienteData.correo);
+  const userExists = await AuthRepositoryMySQL.findUsuarioByCorreo(
+    pacienteData.correo,
+  );
   if (userExists) {
     throw new Error("El correo ya está registrado");
   }
@@ -26,7 +28,8 @@ async function registerPaciente(pacienteData) {
     contrasena: hashedPassword,
   };
 
-  const result = await AuthRepositoryMySQL.registerPacienteWithTransaction(dataToSave);
+  const result =
+    await AuthRepositoryMySQL.registerPacienteWithTransaction(dataToSave);
   return result;
 }
 
@@ -49,7 +52,7 @@ async function login(correo, contrasena) {
     rol: usuario.rol,
   };
 
-  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '2h' });
+  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "2h" });
 
   return {
     token,
@@ -59,7 +62,7 @@ async function login(correo, contrasena) {
       apellidos: usuario.apellidos,
       correo: usuario.correo,
       rol: usuario.rol,
-    }
+    },
   };
 }
 

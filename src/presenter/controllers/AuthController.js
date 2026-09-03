@@ -1,10 +1,26 @@
-const AuthUseCases = require("../../application/usecases/AuthUseCases");
+const AuthUseCases = require("../../application/usecases/Authentication/AuthUseCases");
 
 async function register(req, res) {
   try {
-    const { correo, contrasena, nombres, apellidos, telefono, DNI, fecha_nacimiento } = req.body;
-    const pacienteData = { correo, contrasena, nombres, apellidos, telefono, DNI, fecha_nacimiento };
-    
+    const {
+      correo,
+      contrasena,
+      nombres,
+      apellidos,
+      telefono,
+      DNI,
+      fecha_nacimiento,
+    } = req.body;
+    const pacienteData = {
+      correo,
+      contrasena,
+      nombres,
+      apellidos,
+      telefono,
+      DNI,
+      fecha_nacimiento,
+    };
+
     // Validaciones básicas
     if (!pacienteData.correo || !pacienteData.contrasena || !pacienteData.DNI) {
       return res.status(400).json({ error: "Faltan campos obligatorios" });
@@ -16,7 +32,7 @@ async function register(req, res) {
     if (error.message === "El correo ya está registrado") {
       return res.status(409).json({ error: error.message });
     }
-    console.error("Error en register:", error);
+    console.log(req.body);
     return res.status(500).json({ error: "Error interno del servidor" });
   }
 }
@@ -26,7 +42,9 @@ async function login(req, res) {
     const { correo, contrasena } = req.body;
 
     if (!correo || !contrasena) {
-      return res.status(400).json({ error: "Correo y contraseña son requeridos" });
+      return res
+        .status(400)
+        .json({ error: "Correo y contraseña son requeridos" });
     }
 
     const result = await AuthUseCases.login(correo, contrasena);
