@@ -1,6 +1,11 @@
 const repository = require("../../../src/infrastructure/repositories/UserRepository");
+const { closeConnection } = require("../../../src/infrastructure/database/PoolConexion");
 
 describe("Test de los metodos de repository", () => {
+  afterAll(async () => {
+    await closeConnection();
+  });
+
   test("El email ingresado no debe existir en la base de datos", async () => {
     const result = await repository.existsByEmail("randomEmail@example.com");
     expect(result).toBe(false);

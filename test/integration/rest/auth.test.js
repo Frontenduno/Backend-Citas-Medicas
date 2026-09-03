@@ -1,7 +1,7 @@
 const request = require("supertest");
 const express = require("express");
-const authRoutes = require("../src/infrastructure/routes/authRoutes");
-const { closeConnection } = require("../src/infrastructure/database/PoolConexion");
+const authRoutes = require("../../../src/presenter/routes/authRoutes");
+const { closeConnection } = require("../../../src/infrastructure/database/PoolConexion");
 
 const app = express();
 app.use(express.json());
