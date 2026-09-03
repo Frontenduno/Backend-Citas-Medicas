@@ -6,21 +6,7 @@ async function registerPacienteWithTransaction(pacienteData) {
     connection = await getConnection();
     await connection.beginTransaction();
 
-    // 1. Insert ContactoEmergencia
-    const [contactoResult] = await connection.execute(
-      `INSERT INTO ContactoEmergencia (telefono, correo, nombres, apellidos, parentesco) 
-       VALUES (?, ?, ?, ?, ?)`,
-      [
-        pacienteData.contacto_telefono,
-        pacienteData.contacto_correo,
-        pacienteData.contacto_nombres,
-        pacienteData.contacto_apellidos,
-        pacienteData.contacto_parentesco,
-      ]
-    );
-    const idContactoEmergencia = contactoResult.insertId;
-
-    // 2. Insert Usuario
+    // 1. Insert Usuario
     const [usuarioResult] = await connection.execute(
       `INSERT INTO Usuario (contrasena, nombres, apellidos, correo, telefono, rol) 
        VALUES (?, ?, ?, ?, ?, ?)`,
@@ -35,7 +21,7 @@ async function registerPacienteWithTransaction(pacienteData) {
     );
     const idUsuario = usuarioResult.insertId;
 
-    // 3. Insert Paciente
+    // 2. Insert Paciente
     await connection.execute(
       `INSERT INTO Paciente (DNI, fecha_nacimiento, Usuario_idUsuario, ContactoEmergencia_idContactoEmergencia) 
        VALUES (?, ?, ?, ?)`,
@@ -43,7 +29,7 @@ async function registerPacienteWithTransaction(pacienteData) {
         pacienteData.DNI,
         pacienteData.fecha_nacimiento,
         idUsuario,
-        idContactoEmergencia,
+        null,
       ]
     );
 

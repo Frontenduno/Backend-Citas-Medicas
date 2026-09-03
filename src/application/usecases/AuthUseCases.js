@@ -17,7 +17,12 @@ async function registerPaciente(pacienteData) {
 
   // 3. Preparar datos y llamar al repositorio
   const dataToSave = {
-    ...pacienteData,
+    correo: pacienteData.correo,
+    nombres: pacienteData.nombres,
+    apellidos: pacienteData.apellidos,
+    telefono: pacienteData.telefono,
+    DNI: pacienteData.DNI,
+    fecha_nacimiento: pacienteData.fecha_nacimiento,
     contrasena: hashedPassword,
   };
 

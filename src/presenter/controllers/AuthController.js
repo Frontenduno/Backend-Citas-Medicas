@@ -2,7 +2,8 @@ const AuthUseCases = require("../../application/usecases/AuthUseCases");
 
 async function register(req, res) {
   try {
-    const pacienteData = req.body;
+    const { correo, contrasena, nombres, apellidos, telefono, DNI, fecha_nacimiento } = req.body;
+    const pacienteData = { correo, contrasena, nombres, apellidos, telefono, DNI, fecha_nacimiento };
     
     // Validaciones básicas
     if (!pacienteData.correo || !pacienteData.contrasena || !pacienteData.DNI) {

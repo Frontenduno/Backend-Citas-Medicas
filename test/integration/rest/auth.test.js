@@ -19,12 +19,7 @@ describe("Pruebas de Integración para Endpoints de Autenticación (Auth)", () =
     apellidos: "Perez",
     telefono: "987654321",
     DNI: `123${timestamp.toString().slice(-5)}`,
-    fecha_nacimiento: "1990-01-01",
-    contacto_telefono: "912345678",
-    contacto_correo: `contacto${timestamp}@example.com`,
-    contacto_nombres: "Maria",
-    contacto_apellidos: "Perez",
-    contacto_parentesco: "Madre"
+    fecha_nacimiento: "1990-01-01"
   };
 
   afterAll(async () => {
