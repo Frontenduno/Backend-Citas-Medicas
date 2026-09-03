@@ -1,7 +1,6 @@
 const { getConnection } = require("../database/PoolConexion");
 const { Usuario } = require("../../domain/entity/Usuario");
 
-
 async function existsByEmail(email) {
   let connection;
   try {

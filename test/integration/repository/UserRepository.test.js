@@ -20,7 +20,7 @@ describe("Test de los metodos de repository", () => {
     const result = await repository.findUsuariobyEmail(
       "luis.infantes@email.com",
     );
-    expect(result != null).toBe(true);
+    expect(result.nombres).toBe("Luis Ricardo");
   });
 
   test("Debe ser nulo", async () => {

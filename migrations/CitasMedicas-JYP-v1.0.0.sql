@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS `CitasMedicasJYP`.`Paciente` (
   `DNI` VARCHAR(20) NULL,
   `fecha_nacimiento` DATE NULL,
   `Usuario_idUsuario` INT NOT NULL,
-  `ContactoEmergencia_idContactoEmergencia` INT NOT NULL,
+  `ContactoEmergencia_idContactoEmergencia` INT NULL,
   PRIMARY KEY (`idPaciente`),
   CONSTRAINT `fk_Paciente_Usuario1`
     FOREIGN KEY (`Usuario_idUsuario`)
@@ -231,3 +231,4 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
 
 -- SELECT * FROM Usuario
+-- SELECT * FROM Usuario WHERE correo = 'admin@citasmedicas.com'
