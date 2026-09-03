@@ -231,3 +231,4 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
 
 -- SELECT * FROM Usuario
+-- SELECT * FROM Usuario WHERE correo = 'admin@citasmedicas.com'

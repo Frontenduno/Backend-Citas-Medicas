@@ -1,7 +1,6 @@
 const { getConnection } = require("../database/PoolConexion");
 const { Usuario } = require("../../domain/entity/Usuario");
 
-
 async function existsByEmail(email) {
   const connection = await getConnection();
   const [rows] = await connection.execute(
