@@ -1,5 +1,4 @@
 USE CitasMedicasJYP;
-
 -- 1. Tabla Usuario (5 Pacientes + 5 Médicos = 10 Usuarios en total)
 -- Pacientes (idUsuario 1 al 5)
 INSERT INTO Usuario (contrasena, nombres, apellidos, correo, telefono, rol) VALUES ('pass123', 'Carlos', 'Gomez', 'carlos.gomez@mail.com', '987654321', 'Paciente');
