@@ -10,7 +10,23 @@ async function register(req, res) {
     }
 
     const result = await AuthUseCases.registerPaciente(pacienteData);
-    return res.status(201).json(result);
+
+    // Auto-login para generar el token
+    const loginResult = await AuthUseCases.login(pacienteData.correo, pacienteData.contrasena);
+    const { token, usuario } = loginResult;
+
+    res.cookie('token', token, { 
+      httpOnly: true, 
+      secure: false, 
+      sameSite: 'lax',
+      maxAge: 2 * 60 * 60 * 1000 // 2 horas, igual que el expiresIn del JWT
+    });
+
+    return res.status(201).json({
+      success: result.success,
+      mensaje: result.mensaje,
+      usuario
+    });
   } catch (error) {
     if (error.message === "El correo ya está registrado") {
       return res.status(409).json({ error: error.message });
@@ -29,7 +45,16 @@ async function login(req, res) {
     }
 
     const result = await AuthUseCases.login(correo, contrasena);
-    return res.status(200).json(result);
+    const { token, usuario } = result;
+
+    res.cookie('token', token, { 
+      httpOnly: true, 
+      secure: false, 
+      sameSite: 'lax',
+      maxAge: 2 * 60 * 60 * 1000 // 2 horas
+    });
+
+    return res.status(200).json({ usuario });
   } catch (error) {
     if (error.message === "Credenciales inválidas") {
       return res.status(401).json({ error: error.message });
