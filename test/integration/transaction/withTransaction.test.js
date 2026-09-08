@@ -1,5 +1,5 @@
 const { withTransaction } = require("../../../src/infrastructure/database/TransactionManager");
-const usuarioRepository = require("../../../src/infrastructure/repositories/AuthRepositoryMySQL");
+const usuarioRepository = require("../../../src/infrastructure/repositories/UserRepositoryMySQL");
 const { closeConnection } = require("../../../src/infrastructure/database/PoolConexion");
 const { Usuario } = require("../../../src/domain/entity/Usuario");
 
