@@ -12,13 +12,13 @@ describe("Test de los metodos de repository", () => {
   });
 
   test("El email ingresado debe existir en la base de datos", async () => {
-    const result = await repository.existsByEmail("mgomez@citasmedicas.com");
+    const result = await repository.existsByEmail("juan.perez@example.com");
     expect(result).toBe(true);
   });
 
   test("Debe retornar un usuario", async () => {
     const result = await repository.findUsuariobyEmail(
-      "luis.infantes@email.com",
+      "ale.perez@example.com",
     );
     expect(result != null).toBe(true);
   });
