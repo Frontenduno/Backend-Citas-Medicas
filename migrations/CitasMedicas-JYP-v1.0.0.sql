@@ -232,3 +232,5 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
 -- SELECT * FROM Usuario
 -- SELECT * FROM Usuario WHERE correo = 'admin@citasmedicas.com'
+-- INSERT INTO Usuario (contrasena, nombres, apellidos, correo, telefono, rol) VALUES ('pass123', 'Josue', 'Ataulluco', 'josue.ataulluco@example.com', '987654321', 'Paciente');
+-- INSERT INTO Paciente (DNI, fecha_nacimiento, Usuario_idUsuario, ContactoEmergencia_idContactoEmergencia) VALUES ('70111221', '1990-05-14', 1, 1);

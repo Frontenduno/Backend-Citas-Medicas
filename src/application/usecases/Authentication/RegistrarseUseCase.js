@@ -8,16 +8,21 @@ const {
   CorreoRegistradoException,
 } = require("../../../application/exception/CorreoRegistradoException");
 const { Usuario } = require("../../../domain/entity/Usuario");
+const { Paciente } = require("../../../domain/entity/Paciente");
 
 async function registrarse(nuevoPaciente) {
-  withTransaction(async (connection) => {
-    if (usuarioRepository.existsByEmail(nuevoPaciente.correo)) {
+  await withTransaction(async (connection) => {
+    if (await usuarioRepository.existsByEmail(nuevoPaciente.correo)) {
       throw new CorreoRegistradoException();
     }
 
+    const contrasenaHasheada = await encriptarContrasena(
+      nuevoPaciente.contrasena,
+    );
+
     const newUsuario = new Usuario(
       null,
-      nuevoPaciente.contrasena,
+      contrasenaHasheada,
       nuevoPaciente.nombres,
       nuevoPaciente.apellidos,
       nuevoPaciente.correo,
@@ -25,6 +30,20 @@ async function registrarse(nuevoPaciente) {
       "Paciente",
     );
 
-    const id = usuarioRepository.create();
+    const id = await usuarioRepository.create(newUsuario, connection);
+
+    const newPaciente = new Paciente(
+      null,
+      nuevoPaciente.DNI,
+      nuevoPaciente.fecha_nacimiento,
+      id,
+      null,
+    );
+
+    await pacienteRepository.create(newPaciente, connection);
   });
 }
+
+module.exports = {
+  registrarse,
+};
