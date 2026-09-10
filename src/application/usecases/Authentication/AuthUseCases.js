@@ -1,14 +1,15 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const AuthRepositoryMySQL = require("../../../infrastructure/repositories/AuthRepositoryMySQL");
+const { getConnection } = require("../../infrastructure/database/PoolConexion");
+const UsuarioRepository = require("../../infrastructure/repositories/UsuarioRepository");
+const PacienteRepository = require("../../infrastructure/repositories/PacienteRepository");
+const ContactoEmergenciaRepository = require("../../infrastructure/repositories/ContactoEmergenciaRepository");
 
 const JWT_SECRET = process.env.JWT_SECRET || "secreto_super_seguro_123";
 
 async function registerPaciente(pacienteData) {
   // 1. Validar si el correo ya existe
-  const userExists = await AuthRepositoryMySQL.findUsuarioByCorreo(
-    pacienteData.correo,
-  );
+  const userExists = await UsuarioRepository.findUsuarioByCorreo(pacienteData.correo);
   if (userExists) {
     throw new Error("El correo ya está registrado");
   }
@@ -17,7 +18,7 @@ async function registerPaciente(pacienteData) {
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(pacienteData.contrasena, salt);
 
-  // 3. Preparar datos y llamar al repositorio
+  // 3. Preparar datos
   const dataToSave = {
     correo: pacienteData.correo,
     nombres: pacienteData.nombres,
@@ -28,14 +29,50 @@ async function registerPaciente(pacienteData) {
     contrasena: hashedPassword,
   };
 
-  const result =
-    await AuthRepositoryMySQL.registerPacienteWithTransaction(dataToSave);
-  return result;
+  let connection;
+  try {
+    connection = await getConnection();
+    await connection.beginTransaction();
+
+    let idContactoEmergencia = null;
+    
+    // Solo registrar contacto de emergencia si se envían los datos
+    if (dataToSave.contacto_telefono && dataToSave.contacto_nombres) {
+      idContactoEmergencia = await ContactoEmergenciaRepository.createContactoEmergencia(connection, dataToSave);
+    }
+
+    const idUsuario = await UsuarioRepository.createUsuario(connection, dataToSave);
+
+    dataToSave.idUsuario = idUsuario;
+    dataToSave.idContactoEmergencia = idContactoEmergencia;
+
+    await PacienteRepository.createPaciente(connection, dataToSave);
+
+    await connection.commit();
+    
+    // Generar token de 2 horas para el nuevo usuario
+    const token = jwt.sign({ idUsuario, rol: 'PACIENTE' }, JWT_SECRET, { expiresIn: '2h' });
+    return {
+      success: true,
+      idUsuario,
+      mensaje: "Paciente registrado correctamente",
+      token,
+    };
+  } catch (error) {
+    if (connection) {
+      await connection.rollback();
+    }
+    throw error;
+  } finally {
+    if (connection) {
+      connection.release();
+    }
+  }
 }
 
 async function login(correo, contrasena) {
   // 1. Buscar usuario
-  const usuario = await AuthRepositoryMySQL.findUsuarioByCorreo(correo);
+  const usuario = await UsuarioRepository.findUsuarioByCorreo(correo);
   if (!usuario) {
     throw new Error("Credenciales inválidas");
   }

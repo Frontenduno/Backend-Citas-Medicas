@@ -1,4 +1,6 @@
 const request = require("supertest");
+const express = require("express");
+const cookieParser = require("cookie-parser");
 const authRoutes = require("../../../src/presenter/routes/authRoutes");
 const {
   closeConnection,
@@ -8,7 +10,8 @@ const express = require("express");
 const app = express();
 
 app.use(express.json());
-
+app.use(cookieParser());
+// Montamos las rutas en /auth tal como lo solicitaste
 app.use("/auth", authRoutes);
 
 describe("Pruebas de Integración para Endpoints de Autenticación (Auth)", () => {
@@ -37,10 +40,15 @@ describe("Pruebas de Integración para Endpoints de Autenticación (Auth)", () =
       expect(res.statusCode).toEqual(201);
       expect(res.body).toHaveProperty("success", true);
       expect(res.body).toHaveProperty("idUsuario");
-      expect(res.body).toHaveProperty(
-        "mensaje",
-        "Paciente registrado correctamente",
-      );
+      expect(res.body).toHaveProperty("mensaje", "Paciente registrado correctamente");
+      // El token NO debe estar en el body de la respuesta
+      expect(res.body).not.toHaveProperty("token");
+      // Debe existir la cookie "token" en el header Set-Cookie
+      const cookies = res.headers["set-cookie"];
+      expect(cookies).toBeDefined();
+      expect(cookies.some((c) => c.startsWith("token="))).toBe(true);
+      // La cookie debe ser HttpOnly
+      expect(cookies.some((c) => c.startsWith("token=") && c.includes("HttpOnly"))).toBe(true);
     });
 
     it("debería retornar error 409 si intentamos registrar el mismo correo", async () => {
@@ -69,9 +77,16 @@ describe("Pruebas de Integración para Endpoints de Autenticación (Auth)", () =
       });
 
       expect(res.statusCode).toEqual(200);
-      expect(res.body).toHaveProperty("token");
       expect(res.body.usuario).toHaveProperty("correo", testUser.correo);
       expect(res.body.usuario).toHaveProperty("rol", "PACIENTE");
+      // El token NO debe estar en el body de la respuesta
+      expect(res.body).not.toHaveProperty("token");
+      // Debe existir la cookie "token" en el header Set-Cookie
+      const cookies = res.headers["set-cookie"];
+      expect(cookies).toBeDefined();
+      expect(cookies.some((c) => c.startsWith("token="))).toBe(true);
+      // La cookie debe ser HttpOnly
+      expect(cookies.some((c) => c.startsWith("token=") && c.includes("HttpOnly"))).toBe(true);
     });
 
     it("debería retornar error 401 si la contraseña es incorrecta", async () => {

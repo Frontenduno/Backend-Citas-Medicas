@@ -27,7 +27,17 @@ async function register(req, res) {
     }
 
     const result = await AuthUseCases.registerPaciente(pacienteData);
-    return res.status(201).json(result);
+    // Set JWT as HttpOnly cookie (2h)
+    res.cookie('token', result.token, {
+      httpOnly: true,
+      maxAge: 2 * 60 * 60 * 1000,
+      sameSite: 'strict',
+    });
+    return res.status(201).json({
+      success: result.success,
+      idUsuario: result.idUsuario,
+      mensaje: result.mensaje,
+    });
   } catch (error) {
     if (error.message === "El correo ya está registrado") {
       return res.status(409).json({ error: error.message });
@@ -48,7 +58,15 @@ async function login(req, res) {
     }
 
     const result = await AuthUseCases.login(correo, contrasena);
-    return res.status(200).json(result);
+    // Set JWT as HttpOnly cookie (2h)
+    res.cookie('token', result.token, {
+      httpOnly: true,
+      maxAge: 2 * 60 * 60 * 1000,
+      sameSite: 'strict',
+    });
+    return res.status(200).json({
+      usuario: result.usuario,
+    });
   } catch (error) {
     if (error.message === "Credenciales inválidas") {
       return res.status(401).json({ error: error.message });
