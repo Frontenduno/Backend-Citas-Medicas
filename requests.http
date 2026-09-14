@@ -11,8 +11,8 @@ Content-Type: application/json
   "nombres": "Juan",
   "apellidos": "Perez",
   "telefono": "987654321",
-  "DNI": "12345678",
-  "fecha_nacimiento": "1990-01-01"
+  "fecha_nacimiento": "1990-01-01",
+  "genero": "Masculino"
 }
 
 ### 2. Iniciar Sesión (Login)

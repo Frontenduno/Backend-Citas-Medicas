@@ -8,13 +8,13 @@ INSERT INTO `Especialidad` (`nombreEspecialidad`) VALUES
 ('Dermatología');
 
 -- 2. Inserción de Usuarios (Roles: Medico, Paciente)
-INSERT INTO `Usuario` (`contrasena`, `nombres`, `apellidos`, `correo`, `telefono`, `fecha_nacimiento`, `genero`, `rol`, `updated_at`) VALUES
+INSERT INTO `Usuario` (`contrasena`, `nombres`, `apellidos`, `correo`, `telefono`, `fecha_nacimiento`, `genero`, `rol`) VALUES
 -- Médicos (IDs 1 y 2)
-('$2y$10$e9VxK8v...hash1', 'Carlos', 'Mendoza Ruiz', 'carlos.mendoza@medico.com', '987654321', '1980-05-15', 'Masculino', 'Medico', CURRENT_TIMESTAMP),
-('$2y$10$e9VxK8v...hash2', 'Ana', 'Torres Silva', 'ana.torres@medico.com', '912345678', '1985-09-20', 'Femenino', 'Medico', CURRENT_TIMESTAMP),
+('$2y$10$e9VxK8v...hash1', 'Carlos', 'Mendoza Ruiz', 'carlos.mendoza@medico.com', '987654321', '1980-05-15', 'Masculino', 'Medico'),
+('$2y$10$e9VxK8v...hash2', 'Ana', 'Torres Silva', 'ana.torres@medico.com', '912345678', '1985-09-20', 'Femenino', 'Medico'),
 -- Pacientes (IDs 3 y 4)
-('$2y$10$e9VxK8v...hash3', 'Juan', 'Perez Gomez', 'juan.perez@gmail.com', '955443322', '1992-03-10', 'Masculino', 'Paciente', CURRENT_TIMESTAMP),
-('$2y$10$e9VxK8v...hash4', 'Maria', 'Lopez Quispe', 'maria.lopez@gmail.com', '966778899', '1998-11-25', 'Femenino', 'Paciente', CURRENT_TIMESTAMP);
+('$2y$10$e9VxK8v...hash3', 'Juan', 'Perez Gomez', 'juan.perez@gmail.com', '955443322', '1992-03-10', 'Masculino', 'Paciente'),
+('$2y$10$e9VxK8v...hash4', 'Maria', 'Lopez Quispe', 'maria.lopez@gmail.com', '966778899', '1998-11-25', 'Femenino', 'Paciente');
 
 -- 3. Inserción de Médicos (Vinculados a Usuario y Especialidad)
 INSERT INTO `Medico` (`Usuario_idUsuario`, `Especialidad_idEspecialidad`) VALUES 
