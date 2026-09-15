@@ -56,6 +56,7 @@ describe('LoginUseCase', () => {
     expect(mockUsuarioRepository.findByEmail).toHaveBeenCalledWith('test@mail.com');
     expect(mockBcryptHasher.compararContrasenas).toHaveBeenCalledWith('password', 'hashed');
     expect(mockJwtGenerator.firmarCredenciales).toHaveBeenCalledWith({
+      id: 1,
       correo: 'test@mail.com',
       rol: 'PACIENTE',
     });

@@ -54,7 +54,7 @@ export class LoginUseCase {
     }
 
     const payload = {
-      id: usuario.idUsuario,
+      id: usuario.idUsuario!,
       correo: usuario.correo,
       rol: usuario.rol,
     };

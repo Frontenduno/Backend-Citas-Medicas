@@ -42,7 +42,11 @@ export function createCompositionRoot() {
   });
 
   const registrarContactoEmergenciaUseCase = 
-  new RegistrarContactoEmergenciaUseCase(contactoEmergenciaRepository);
+  new RegistrarContactoEmergenciaUseCase(
+    contactoEmergenciaRepository,
+    transactionManager,
+    pacienteRepository,
+  );
 
   //controllers
   const authController = createAuthController({
@@ -51,6 +55,7 @@ export function createCompositionRoot() {
   });
   const pacienteController = createPacienteController(
     registrarContactoEmergenciaUseCase,
+    jwtGenerator,
   );
 
   //routes

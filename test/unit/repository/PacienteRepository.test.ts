@@ -4,6 +4,7 @@ import { IPacienteRepository } from "../../../src/domain/repository/PacienteRepo
 describe("PacienteRepository", () => {
   const repository: IPacienteRepository = {
       create: jest.fn().mockImplementation(()=>1),
+      findByIdUsuario: jest.fn()
     };
 
   it("debe registrar paciente", async () => {
