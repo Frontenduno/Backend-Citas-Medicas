@@ -1,7 +1,7 @@
-import { IUsuarioRepository } from '../../../domain/repository/UsuarioRepository';
-import { IBcryptHasher } from '../../ports/BcryptHasher';
-import { IJwtGenerator } from '../../ports/JwtGenerator';
-import { CredencialesIncorrectasException } from '../../exception/CredencialesIncorrectasException';
+import { IUsuarioRepository } from "../../../domain/repository/UsuarioRepository";
+import { IBcryptHasher } from "../../ports/BcryptHasher";
+import { IJwtGenerator } from "../../ports/JwtGenerator";
+import { CredencialesIncorrectasException } from "../../exception/CredencialesIncorrectasException";
 
 export interface LoginUseCaseDependencies {
   usuarioRepository: IUsuarioRepository;
@@ -33,17 +33,31 @@ export class LoginUseCase {
     this.usuarioRepository = deps.usuarioRepository;
     this.bcryptHasher = deps.bcryptHasher;
     this.jwtGenerator = deps.jwtGenerator;
-    this.credencialesIncorrectasException = deps.credencialesIncorrectasException;
+    this.credencialesIncorrectasException =
+      deps.credencialesIncorrectasException;
   }
 
-  async execute(correo: string, contrasena: string): Promise<LoginUseCaseResult> {
+  async execute(
+    correo: string,
+    contrasena: string,
+  ): Promise<LoginUseCaseResult> {
     const usuario = await this.usuarioRepository.findByEmail(correo);
 
-    if (!usuario || !(await this.bcryptHasher.compararContrasenas(contrasena, usuario.contrasena))) {
+    if (
+      !usuario ||
+      !(await this.bcryptHasher.compararContrasenas(
+        contrasena,
+        usuario.contrasena,
+      ))
+    ) {
       throw this.credencialesIncorrectasException;
     }
 
-    const payload = { correo: usuario.correo, rol: usuario.rol };
+    const payload = {
+      id: usuario.idUsuario,
+      correo: usuario.correo,
+      rol: usuario.rol,
+    };
     const token = this.jwtGenerator.firmarCredenciales(payload);
 
     return {

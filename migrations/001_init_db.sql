@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS `Sistema_Medico_JYP`.`Usuario` (
   PRIMARY KEY (`idUsuario`))
 ENGINE = InnoDB;
 
-CREATE UNIQUE INDEX `Correo_UNIQUE` ON `Sistema_Medico_JYP`.`Usuario` (`correo` ASC) VISIBLE;
+CREATE UNIQUE INDEX `Correo_UNIQUE` ON `Sistema_Medico_JYP`.`Usuario` (`correo`);
 
 
 -- -----------------------------------------------------
@@ -57,9 +57,9 @@ CREATE TABLE IF NOT EXISTS `Sistema_Medico_JYP`.`Paciente` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
-CREATE INDEX `fk_Paciente_Usuario1_idx` ON `Sistema_Medico_JYP`.`Paciente` (`Usuario_idUsuario` ASC) VISIBLE;
+CREATE INDEX `fk_Paciente_Usuario1_idx` ON `Sistema_Medico_JYP`.`Paciente` (`Usuario_idUsuario`) ;
 
-CREATE UNIQUE INDEX `Usuario_idUsuario_UNIQUE` ON `Sistema_Medico_JYP`.`Paciente` (`Usuario_idUsuario` ASC) VISIBLE;
+CREATE UNIQUE INDEX `Usuario_idUsuario_UNIQUE` ON `Sistema_Medico_JYP`.`Paciente` (`Usuario_idUsuario`);
 
 
 -- -----------------------------------------------------
@@ -96,11 +96,11 @@ CREATE TABLE IF NOT EXISTS `Sistema_Medico_JYP`.`Medico` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
-CREATE INDEX `fk_Medico_Usuario1_idx` ON `Sistema_Medico_JYP`.`Medico` (`Usuario_idUsuario` ASC) VISIBLE;
+CREATE INDEX `fk_Medico_Usuario1_idx` ON `Sistema_Medico_JYP`.`Medico` (`Usuario_idUsuario` ) ;
 
-CREATE UNIQUE INDEX `Usuario_idUsuario_UNIQUE` ON `Sistema_Medico_JYP`.`Medico` (`Usuario_idUsuario` ASC) VISIBLE;
+CREATE UNIQUE INDEX `Usuario_idUsuario_UNIQUE` ON `Sistema_Medico_JYP`.`Medico` (`Usuario_idUsuario` ) ;
 
-CREATE INDEX `fk_Medico_Especialidad1_idx` ON `Sistema_Medico_JYP`.`Medico` (`Especialidad_idEspecialidad` ASC) VISIBLE;
+CREATE INDEX `fk_Medico_Especialidad1_idx` ON `Sistema_Medico_JYP`.`Medico` (`Especialidad_idEspecialidad` ) ;
 
 
 -- -----------------------------------------------------
@@ -128,9 +128,9 @@ CREATE TABLE IF NOT EXISTS `Sistema_Medico_JYP`.`Cita` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
-CREATE INDEX `fk_TicketCita_Paciente1_idx` ON `Sistema_Medico_JYP`.`Cita` (`Paciente_idPaciente` ASC) VISIBLE;
+CREATE INDEX `fk_TicketCita_Paciente1_idx` ON `Sistema_Medico_JYP`.`Cita` (`Paciente_idPaciente` ) ;
 
-CREATE INDEX `fk_TicketCita_Medico1_idx` ON `Sistema_Medico_JYP`.`Cita` (`Medico_idMedico` ASC) VISIBLE;
+CREATE INDEX `fk_TicketCita_Medico1_idx` ON `Sistema_Medico_JYP`.`Cita` (`Medico_idMedico` ) ;
 
 
 -- -----------------------------------------------------
@@ -153,7 +153,7 @@ CREATE TABLE IF NOT EXISTS `Sistema_Medico_JYP`.`TicketCita` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
-CREATE INDEX `fk_TicketCita_Cita1_idx` ON `Sistema_Medico_JYP`.`TicketCita` (`Cita_idCita` ASC) VISIBLE;
+CREATE INDEX `fk_TicketCita_Cita1_idx` ON `Sistema_Medico_JYP`.`TicketCita` (`Cita_idCita` ) ;
 
 
 -- -----------------------------------------------------
@@ -177,7 +177,7 @@ CREATE TABLE IF NOT EXISTS `Sistema_Medico_JYP`.`ContactoEmergencia` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
-CREATE INDEX `fk_ContactoEmergencia_Paciente1_idx` ON `Sistema_Medico_JYP`.`ContactoEmergencia` (`Paciente_idPaciente` ASC) VISIBLE;
+CREATE INDEX `fk_ContactoEmergencia_Paciente1_idx` ON `Sistema_Medico_JYP`.`ContactoEmergencia` (`Paciente_idPaciente` ) ;
 
 
 -- -----------------------------------------------------
@@ -196,7 +196,7 @@ CREATE TABLE IF NOT EXISTS `Sistema_Medico_JYP`.`Horario` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
-CREATE INDEX `fk_Horario_Medico1_idx` ON `Sistema_Medico_JYP`.`Horario` (`Medico_idMedico` ASC) VISIBLE;
+CREATE INDEX `fk_Horario_Medico1_idx` ON `Sistema_Medico_JYP`.`Horario` (`Medico_idMedico` ) ;
 
 
 -- -----------------------------------------------------
@@ -221,7 +221,7 @@ CREATE TABLE IF NOT EXISTS `Sistema_Medico_JYP`.`Pago` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
-CREATE INDEX `fk_Pago_TicketCita1_idx` ON `Sistema_Medico_JYP`.`Pago` (`TicketCita_idTicketCita` ASC) VISIBLE;
+CREATE INDEX `fk_Pago_TicketCita1_idx` ON `Sistema_Medico_JYP`.`Pago` (`TicketCita_idTicketCita` ) ;
 
 
 -- -----------------------------------------------------
@@ -244,7 +244,7 @@ CREATE TABLE IF NOT EXISTS `Sistema_Medico_JYP`.`DetallesHorario` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
-CREATE INDEX `fk_DetallesHorario_Horario1_idx` ON `Sistema_Medico_JYP`.`DetallesHorario` (`Horario_idHorario` ASC) VISIBLE;
+CREATE INDEX `fk_DetallesHorario_Horario1_idx` ON `Sistema_Medico_JYP`.`DetallesHorario` (`Horario_idHorario` ) ;
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
