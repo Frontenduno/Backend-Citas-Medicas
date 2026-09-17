@@ -1,6 +1,7 @@
 import { Cita } from '../entities/Cita';
 import { TicketCita, EstadoTicket } from '../entities/TicketCita';
 import { Horario } from '../entities/Horario';
+import { DetallesHorario } from '../entities/DetallesHorario';
 
 export interface CitaWithTicket {
   cita: Cita;
@@ -11,6 +12,7 @@ export interface DisponibilidadResult {
   disponible: boolean;
   motivo?: string;
   horario?: Horario;
+  detallesHorario?: DetallesHorario;
 }
 
 export interface ICitaRepository {

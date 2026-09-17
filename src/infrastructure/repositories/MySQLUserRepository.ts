@@ -10,6 +10,8 @@ interface UserRow extends RowDataPacket {
   apellidos: string;
   correo: string;
   telefono: string | null;
+  fecha_nacimiento: string;
+  genero: string;
   rol: string;
 }
 
@@ -45,6 +47,8 @@ export class MySQLUserRepository implements IUserRepository {
         userResult.apellidos,
         userResult.correo,
         userResult.telefono,
+        userResult.fecha_nacimiento,
+        userResult.genero,
         userResult.rol,
       );
     } finally {

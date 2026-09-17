@@ -1,29 +1,29 @@
-import express, { Application } from 'express';
-import morgan from 'morgan';
+import express, { Application } from "express";
+import morgan from "morgan";
 
 // Repositorios (Infrastructure)
-import { MySQLCitaRepository } from './src/infrastructure/repositories/MySQLCitaRepository';
-import { MySQLUserRepository } from './src/infrastructure/repositories/MySQLUserRepository';
-import { ICitaRepository } from './src/domain/repositories/ICitaRepository';
-import { IUserRepository } from './src/domain/repositories/IUserRepository';
+import { MySQLCitaRepository } from "./src/infrastructure/repositories/MySQLCitaRepository";
+import { MySQLUserRepository } from "./src/infrastructure/repositories/MySQLUserRepository";
+import { ICitaRepository } from "./src/domain/repositories/ICitaRepository";
+import { IUserRepository } from "./src/domain/repositories/IUserRepository";
 
 // Casos de Uso - Citas (Application)
-import { CreateCitaUseCase } from './src/application/use-cases/citas/CreateCitaUseCase';
-import { GetCitaByIdUseCase } from './src/application/use-cases/citas/GetCitaByIdUseCase';
-import { GetCitasByPacienteUseCase } from './src/application/use-cases/citas/GetCitasByPacienteUseCase';
-import { GetCitasByMedicoUseCase } from './src/application/use-cases/citas/GetCitasByMedicoUseCase';
-import { GetCitasByFechaUseCase } from './src/application/use-cases/citas/GetCitasByFechaUseCase';
-import { UpdateEstadoCitaUseCase } from './src/application/use-cases/citas/UpdateEstadoCitaUseCase';
-import { DeleteCitaUseCase } from './src/application/use-cases/citas/DeleteCitaUseCase';
-import { CheckDisponibilidadUseCase } from './src/application/use-cases/citas/CheckDisponibilidadUseCase';
+import { CreateCitaUseCase } from "./src/application/usecases/citas/CreateCitaUseCase";
+import { GetCitaByIdUseCase } from "./src/application/usecases/citas/GetCitaByIdUseCase";
+import { GetCitasByPacienteUseCase } from "./src/application/usecases/citas/GetCitasByPacienteUseCase";
+import { GetCitasByMedicoUseCase } from "./src/application/usecases/citas/GetCitasByMedicoUseCase";
+import { GetCitasByFechaUseCase } from "./src/application/usecases/citas/GetCitasByFechaUseCase";
+import { UpdateEstadoCitaUseCase } from "./src/application/usecases/citas/UpdateEstadoCitaUseCase";
+import { DeleteCitaUseCase } from "./src/application/usecases/citas/DeleteCitaUseCase";
+import { CheckDisponibilidadUseCase } from "./src/application/usecases/citas/CheckDisponibilidadUseCase";
 
 // Casos de Uso - Usuarios (Application)
-import { FindUserByEmailUseCase } from './src/application/use-cases/users/FindUserByEmailUseCase';
-import { ExistsUserByEmailUseCase } from './src/application/use-cases/users/ExistsUserByEmailUseCase';
+import { FindUserByEmailUseCase } from "./src/application/usecases/users/FindUserByEmailUseCase";
+import { ExistsUserByEmailUseCase } from "./src/application/usecases/users/ExistsUserByEmailUseCase";
 
 // Controladores y Rutas (Presenter / HTTP)
-import { CitaController } from './src/presenter/controllers/CitaController';
-import { createCitaRouter } from './src/presenter/routes/citaRoutes';
+import { CitaController } from "./src/presenter/controllers/CitaController";
+import { createCitaRouter } from "./src/presenter/routes/citaRoutes";
 
 /**
  * CompositionRoot: Centraliza la instanciación, configuración e inyección
@@ -64,16 +64,30 @@ export class CompositionRoot {
     // 2. Instanciar Casos de Uso de Citas inyectando el repositorio
     this.createCitaUseCase = new CreateCitaUseCase(this.citaRepository);
     this.getCitaByIdUseCase = new GetCitaByIdUseCase(this.citaRepository);
-    this.getCitasByPacienteUseCase = new GetCitasByPacienteUseCase(this.citaRepository);
-    this.getCitasByMedicoUseCase = new GetCitasByMedicoUseCase(this.citaRepository);
-    this.getCitasByFechaUseCase = new GetCitasByFechaUseCase(this.citaRepository);
-    this.updateEstadoCitaUseCase = new UpdateEstadoCitaUseCase(this.citaRepository);
+    this.getCitasByPacienteUseCase = new GetCitasByPacienteUseCase(
+      this.citaRepository,
+    );
+    this.getCitasByMedicoUseCase = new GetCitasByMedicoUseCase(
+      this.citaRepository,
+    );
+    this.getCitasByFechaUseCase = new GetCitasByFechaUseCase(
+      this.citaRepository,
+    );
+    this.updateEstadoCitaUseCase = new UpdateEstadoCitaUseCase(
+      this.citaRepository,
+    );
     this.deleteCitaUseCase = new DeleteCitaUseCase(this.citaRepository);
-    this.checkDisponibilidadUseCase = new CheckDisponibilidadUseCase(this.citaRepository);
+    this.checkDisponibilidadUseCase = new CheckDisponibilidadUseCase(
+      this.citaRepository,
+    );
 
     // 3. Instanciar Casos de Uso de Usuarios
-    this.findUserByEmailUseCase = new FindUserByEmailUseCase(this.userRepository);
-    this.existsUserByEmailUseCase = new ExistsUserByEmailUseCase(this.userRepository);
+    this.findUserByEmailUseCase = new FindUserByEmailUseCase(
+      this.userRepository,
+    );
+    this.existsUserByEmailUseCase = new ExistsUserByEmailUseCase(
+      this.userRepository,
+    );
 
     // 4. Instanciar Controladores inyectando los casos de uso
     this.citaController = new CitaController(
@@ -105,24 +119,23 @@ export class CompositionRoot {
 
   private setupMiddlewares(): void {
     this.app.use(express.json());
-    this.app.use(morgan('dev'));
+    this.app.use(morgan("dev"));
   }
 
   private setupRoutes(): void {
     // Health check / Root endpoint
-    this.app.get('/', (_req, res) => {
+    this.app.get("/", (_req, res) => {
       res.json({
-        message: 'API Citas Médicas - Clean Architecture (TypeScript)',
-        status: 'online',
+        message: "API Citas Médicas - Clean Architecture (TypeScript)",
+        status: "online",
       });
     });
 
     // Rutas de Citas
-    this.app.use('/api/citas', createCitaRouter(this.citaRepository));
+    this.app.use("/api/citas", createCitaRouter(this.citaRepository));
   }
 }
 
 // Exportar instancia por defecto lista para ser consumida
 export const compositionRoot = CompositionRoot.getInstance();
 export default compositionRoot;
-
