@@ -2,7 +2,8 @@ import { RowDataPacket, ResultSetHeader } from 'mysql2/promise';
 import { getConnection } from '../database/PoolConexion';
 import { Cita } from '../../domain/entities/Cita';
 import { TicketCita, EstadoTicket } from '../../domain/entities/TicketCita';
-import { Horario, DiaSemana } from '../../domain/entities/Horario';
+import { Horario } from '../../domain/entities/Horario';
+import { DetallesHorario, DiaSemana } from '../../domain/entities/DetallesHorario';
 import {
   ICitaRepository,
   CitaWithTicket,
@@ -24,11 +25,16 @@ interface CitaRow extends RowDataPacket {
 
 interface HorarioRow extends RowDataPacket {
   idHorario: number;
+  Medico_idMedico: number;
+}
+
+interface DetallesHorarioRow extends RowDataPacket {
+  idDetallesHorario: number;
   diaSemana: DiaSemana;
   turno: string;
   horaInicio: string;
   horaFin: string;
-  Medico_idMedico: number;
+  Horario_idHorario: number;
 }
 
 function generarCodigoTicket(): string {
@@ -327,35 +333,46 @@ export class MySQLCitaRepository implements ICitaRepository {
       const diaSinTilde = diasSemana[diaIndex];
       const diaConTilde = diasConTilde[diaIndex];
 
-      const [horarios] = await connection.execute<HorarioRow[]>(
-        'SELECT * FROM Horario WHERE Medico_idMedico = ? AND (diaSemana = ? OR diaSemana = ?)',
+      const [detallesHorarios] = await connection.execute<DetallesHorarioRow[]>(
+        `SELECT dh.* FROM DetallesHorario dh
+         INNER JOIN Horario h ON h.idHorario = dh.Horario_idHorario
+         WHERE h.Medico_idMedico = ? AND (dh.diaSemana = ? OR dh.diaSemana = ?)`,
         [medicoId, diaSinTilde, diaConTilde],
       );
 
-      if (horarios.length === 0) {
+      if (detallesHorarios.length === 0) {
         return {
           disponible: false,
           motivo: `El médico no tiene horario asignado para el día ${diaConTilde}`,
         };
       }
 
-      const horario = horarios[0];
-      if (hora < horario.horaInicio || hora >= horario.horaFin) {
+      const detalle = detallesHorarios[0];
+      if (hora < detalle.horaInicio || hora >= detalle.horaFin) {
         return {
           disponible: false,
-          motivo: `La hora está fuera del horario del médico (${horario.horaInicio} - ${horario.horaFin})`,
+          motivo: `La hora está fuera del horario del médico (${detalle.horaInicio} - ${detalle.horaFin})`,
         };
       }
+
+      const [horarios] = await connection.execute<HorarioRow[]>(
+        'SELECT * FROM Horario WHERE idHorario = ?',
+        [detalle.Horario_idHorario],
+      );
 
       return {
         disponible: true,
         horario: new Horario(
-          horario.idHorario,
-          horario.diaSemana,
-          horario.turno,
-          horario.horaInicio,
-          horario.horaFin,
-          horario.Medico_idMedico,
+          horarios[0].idHorario,
+          horarios[0].Medico_idMedico,
+        ),
+        detallesHorario: new DetallesHorario(
+          detalle.idDetallesHorario,
+          detalle.diaSemana,
+          detalle.turno,
+          detalle.horaInicio,
+          detalle.horaFin,
+          detalle.Horario_idHorario,
         ),
       };
     } finally {

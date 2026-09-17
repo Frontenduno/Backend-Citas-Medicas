@@ -1,4 +1,5 @@
 export type RolUsuario = 'Paciente' | 'Medico' | 'Administrador';
+export type GeneroUsuario = 'Masculino' | 'Femenino' | 'Otro';
 
 export class Usuario {
   constructor(
@@ -8,6 +9,8 @@ export class Usuario {
     public readonly apellidos: string,
     public readonly correo: string,
     public readonly telefono: string | null,
+    public readonly fecha_nacimiento: string,
+    public readonly genero: GeneroUsuario | string,
     public readonly rol: RolUsuario | string,
   ) {}
 }
