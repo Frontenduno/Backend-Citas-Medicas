@@ -11,8 +11,12 @@ import { CredencialesIncorrectasException } from './src/application/exception/Cr
 import { CorreoRegistradoException } from './src/application/exception/CorreoRegistradoException';
 
 export function createCompositionRoot() {
+
+  //repositories
   const usuarioRepository = new UsuarioRepositoryMySQL();
   const pacienteRepository = new PacienteRepositoryMySQL();
+
+  //ports
   const jwtGenerator = new JwtGeneratorImpl();
   const bcryptHasher = new BcryptHasherImpl();
   const transactionManager = new TransactionManagerImpl();
