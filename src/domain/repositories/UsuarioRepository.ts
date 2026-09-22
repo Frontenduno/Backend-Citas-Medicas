@@ -1,7 +1,7 @@
-import { Usuario } from '../entity/Usuario';
+import { Usuario } from '../entities/Usuario';
 
 export interface IUsuarioRepository {
   existsByEmail(email: string, connection?: any): Promise<boolean>;
-  findByEmail(email: string, connection?: any): Promise<Usuario | null>;
+  findUsuariobyEmail(email: string, connection?: any): Promise<Usuario | null>;
   create(usuario: Usuario, connection?: any): Promise<number>;
 }

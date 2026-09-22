@@ -1,4 +1,4 @@
-import { IUsuarioRepository } from "../../../domain/repository/UsuarioRepository";
+import { IUsuarioRepository } from "../../../domain/repositories/UsuarioRepository";
 import { IBcryptHasher } from "../../ports/BcryptHasher";
 import { IJwtGenerator } from "../../ports/JwtGenerator";
 import { CredencialesIncorrectasException } from "../../exception/CredencialesIncorrectasException";
@@ -41,7 +41,7 @@ export class LoginUseCase {
     correo: string,
     contrasena: string,
   ): Promise<LoginUseCaseResult> {
-    const usuario = await this.usuarioRepository.findByEmail(correo);
+    const usuario = await this.usuarioRepository.findUsuariobyEmail(correo);
 
     if (
       !usuario ||

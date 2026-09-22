@@ -1,11 +1,27 @@
 export class ContactoEmergencia {
+  idContactoEmergencia?: number;
+  telefono: string;
+  correo: string;
+  nombres: string;
+  apellidos: string;
+  parentesco: string;
+  pacienteId?: number;
+
   constructor(
-    public readonly idContactoEmergencia: number,
-    public readonly telefono: string,
-    public readonly correo: string,
-    public readonly nombres: string,
-    public readonly apellidos: string,
-    public readonly parentesco: string,
-    public readonly Paciente_idPaciente: number | null,
-  ) {}
+    idContactoEmergencia: number | null,
+    telefono: string,
+    correo: string,
+    nombres: string,
+    apellidos: string,
+    parentesco: string,
+    pacienteId: number | null,
+  ) {
+    this.idContactoEmergencia = idContactoEmergencia ?? undefined;
+    this.telefono = telefono;
+    this.correo = correo;
+    this.nombres = nombres;
+    this.apellidos = apellidos;
+    this.parentesco = parentesco;
+    this.pacienteId = pacienteId ?? undefined;
+  }
 }

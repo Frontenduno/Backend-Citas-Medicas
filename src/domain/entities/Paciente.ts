@@ -1,6 +1,12 @@
 export class Paciente {
+  idPaciente?: number;
+  idUsuario: number;
+
   constructor(
-    public readonly idPaciente: number,
-    public readonly Usuario_idUsuario: number,
-  ) {}
+    idPaciente: number | null,
+    idUsuario: number,
+  ) {
+    this.idPaciente = idPaciente ?? undefined;
+    this.idUsuario = idUsuario;
+  }
 }

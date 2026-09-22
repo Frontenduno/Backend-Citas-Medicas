@@ -1,4 +1,4 @@
-import { Paciente } from '../../../src/domain/entity/Paciente';
+import { Paciente } from '../../../src/domain/entities/Paciente';
 
 describe('Paciente', () => {
   it('debe crear una instancia de Paciente con los valores proporcionados', () => {

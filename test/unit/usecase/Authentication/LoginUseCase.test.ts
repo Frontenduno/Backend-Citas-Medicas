@@ -1,5 +1,5 @@
 import { LoginUseCase, LoginUseCaseDependencies } from '../../../../src/application/usecases/Authentication/LoginUseCase';
-import { IUsuarioRepository } from '../../../../src/domain/repository/UsuarioRepository';
+import { IUsuarioRepository } from '../../../../src/domain/repositories/UsuarioRepository';
 import { IBcryptHasher } from '../../../../src/application/ports/BcryptHasher';
 import { IJwtGenerator } from '../../../../src/application/ports/JwtGenerator';
 import { CredencialesIncorrectasException } from '../../../../src/application/exception/CredencialesIncorrectasException';
@@ -13,7 +13,7 @@ describe('LoginUseCase', () => {
 
   beforeEach(() => {
     mockUsuarioRepository = {
-      findByEmail: jest.fn(),
+      findUsuariobyEmail: jest.fn(),
     } as unknown as jest.Mocked<IUsuarioRepository>;
 
     mockBcryptHasher = {
@@ -47,13 +47,13 @@ describe('LoginUseCase', () => {
       genero: 'Masculino',
     };
 
-    mockUsuarioRepository.findByEmail.mockResolvedValue(mockUsuario);
+    mockUsuarioRepository.findUsuariobyEmail.mockResolvedValue(mockUsuario);
     mockBcryptHasher.compararContrasenas.mockResolvedValue(true);
     mockJwtGenerator.firmarCredenciales.mockReturnValue('token123');
 
     const result = await loginUseCase.execute('test@mail.com', 'password');
 
-    expect(mockUsuarioRepository.findByEmail).toHaveBeenCalledWith('test@mail.com');
+    expect(mockUsuarioRepository.findUsuariobyEmail).toHaveBeenCalledWith('test@mail.com');
     expect(mockBcryptHasher.compararContrasenas).toHaveBeenCalledWith('password', 'hashed');
     expect(mockJwtGenerator.firmarCredenciales).toHaveBeenCalledWith({
       id: 1,
@@ -73,7 +73,7 @@ describe('LoginUseCase', () => {
   });
 
   it('debe lanzar CredencialesIncorrectasException si el usuario no existe', async () => {
-    mockUsuarioRepository.findByEmail.mockResolvedValue(null);
+    mockUsuarioRepository.findUsuariobyEmail.mockResolvedValue(null);
 
     await expect(loginUseCase.execute('test@mail.com', 'password')).rejects.toThrow(CredencialesIncorrectasException);
     expect(mockBcryptHasher.compararContrasenas).not.toHaveBeenCalled();
@@ -92,7 +92,7 @@ describe('LoginUseCase', () => {
       genero: 'Masculino',
     };
 
-    mockUsuarioRepository.findByEmail.mockResolvedValue(mockUsuario);
+    mockUsuarioRepository.findUsuariobyEmail.mockResolvedValue(mockUsuario);
     mockBcryptHasher.compararContrasenas.mockResolvedValue(false);
 
     await expect(loginUseCase.execute('test@mail.com', 'wrong')).rejects.toThrow(CredencialesIncorrectasException);

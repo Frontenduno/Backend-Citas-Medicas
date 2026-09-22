@@ -1,7 +1,7 @@
 import { PacienteRepositoryMySQL } from '../../../src/infrastructure/repositories/PacienteRepositoryMySQL';
-import { Paciente } from '../../../src/domain/entity/Paciente';
-import { UsuarioRepositoryMySQL } from '../../../src/infrastructure/repositories/UserRepositoryMySQL';
-import { Usuario } from '../../../src/domain/entity/Usuario';
+import { Paciente } from '../../../src/domain/entities/Paciente';
+import { MySQLUserRepository } from '../../../src/infrastructure/repositories/MySQLUserRepository';
+import { Usuario } from '../../../src/domain/entities/Usuario';
 import { closeConnection, getConnection } from '../../../src/infrastructure/database/PoolConexion';
 
 describe('PacienteRepositoryMySQL', () => {
@@ -11,7 +11,7 @@ describe('PacienteRepositoryMySQL', () => {
 
   test('Debe registrar paciente', async () => {
     const pacienteRepository = new PacienteRepositoryMySQL();
-    const usuarioRepository = new UsuarioRepositoryMySQL();
+    const usuarioRepository = new MySQLUserRepository();
     const connection = await getConnection();
     try {
       await connection.beginTransaction();

@@ -1,9 +1,9 @@
 import { LoginUseCase } from '../../../src/application/usecases/Authentication/LoginUseCase';
-import { UsuarioRepositoryMySQL } from '../../../src/infrastructure/repositories/UserRepositoryMySQL';
+import { MySQLUserRepository } from '../../../src/infrastructure/repositories/MySQLUserRepository';
 import { BcryptHasherImpl } from '../../../src/infrastructure/service/BcryptHasherImpl';
 import { JwtGeneratorImpl } from '../../../src/infrastructure/service/JwtGeneratorImpl';
 import { CredencialesIncorrectasException } from '../../../src/application/exception/CredencialesIncorrectasException';
-import { Usuario } from '../../../src/domain/entity/Usuario';
+import { Usuario } from '../../../src/domain/entities/Usuario';
 import { closeConnection } from '../../../src/infrastructure/database/PoolConexion';
 
 describe('LoginUseCase (Integration)', () => {
@@ -12,7 +12,7 @@ describe('LoginUseCase (Integration)', () => {
   });
 
   test('debe autenticar un usuario registrado', async () => {
-    const usuarioRepository = new UsuarioRepositoryMySQL();
+    const usuarioRepository = new MySQLUserRepository();
     const bcryptHasher = new BcryptHasherImpl();
     const jwtGenerator = new JwtGeneratorImpl();
 

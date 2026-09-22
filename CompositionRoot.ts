@@ -5,7 +5,7 @@ import { createAuthController } from "./src/presenter/controllers/AuthController
 import { createAuthRoutes } from "./src/presenter/routes/auth.routes";
 import { RegisterUseCase } from "./src/application/usecases/Authentication/RegisterUseCase";
 import { LoginUseCase } from "./src/application/usecases/Authentication/LoginUseCase";
-import { UsuarioRepositoryMySQL } from "./src/infrastructure/repositories/UserRepositoryMySQL";
+import { MySQLUserRepository } from "./src/infrastructure/repositories/MySQLUserRepository";
 import { PacienteRepositoryMySQL } from "./src/infrastructure/repositories/PacienteRepositoryMySQL";
 import { JwtGeneratorImpl } from "./src/infrastructure/service/JwtGeneratorImpl";
 import { BcryptHasherImpl } from "./src/infrastructure/service/BcryptHasherImpl";
@@ -29,19 +29,16 @@ import { DeleteCitaUseCase } from "./src/application/usecases/citas/DeleteCitaUs
 import { CheckDisponibilidadUseCase } from "./src/application/usecases/citas/CheckDisponibilidadUseCase";
 import { CitaController } from "./src/presenter/controllers/CitaController";
 import { createCitaRouter } from "./src/presenter/routes/citaRoutes";
-import { IUserRepository } from "./src/domain/repositories/IUserRepository";
-import { MySQLUserRepository } from "./src/infrastructure/repositories/MySQLUserRepository";
 import { FindUserByEmailUseCase } from "./src/application/usecases/users/FindUserByEmailUseCase";
 import { ExistsUserByEmailUseCase } from "./src/application/usecases/users/ExistsUserByEmailUseCase";
-import { IUsuarioRepository } from "./src/domain/repositories/IUsuarioRepository";
+import { IUsuarioRepository } from "./src/domain/repositories/UsuarioRepository";
 
 export function createCompositionRoot() {
   // Repositories (Infrastructure)
-  const usuarioRepository = new UsuarioRepositoryMySQL();
+  const usuarioRepository: IUsuarioRepository = new MySQLUserRepository();
   const pacienteRepository = new PacienteRepositoryMySQL();
   const contactoEmergenciaRepository = new ContactoEmergenciaMySQL();
   const citaRepository: ICitaRepository = new MySQLCitaRepository();
-  const userRepository: IUserRepository = new MySQLUserRepository();
 
   // Ports / Services
   const jwtGenerator = new JwtGeneratorImpl();
@@ -59,8 +56,8 @@ export function createCompositionRoot() {
   const checkDisponibilidadUseCase = new CheckDisponibilidadUseCase(citaRepository);
 
   // Use Cases - Usuarios (Application)
-  const findUserByEmailUseCase = new FindUserByEmailUseCase(userRepository);
-  const existsUserByEmailUseCase = new ExistsUserByEmailUseCase(userRepository);
+  const findUserByEmailUseCase = new FindUserByEmailUseCase(usuarioRepository);
+  const existsUserByEmailUseCase = new ExistsUserByEmailUseCase(usuarioRepository);
 
   // Use Cases - Auth (Application)
   const registerUseCase = new RegisterUseCase({

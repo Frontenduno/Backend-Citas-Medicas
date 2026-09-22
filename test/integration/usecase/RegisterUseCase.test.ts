@@ -1,5 +1,5 @@
 import { RegisterUseCase } from '../../../src/application/usecases/Authentication/RegisterUseCase';
-import { UsuarioRepositoryMySQL } from '../../../src/infrastructure/repositories/UserRepositoryMySQL';
+import { MySQLUserRepository } from '../../../src/infrastructure/repositories/MySQLUserRepository';
 import { PacienteRepositoryMySQL } from '../../../src/infrastructure/repositories/PacienteRepositoryMySQL';
 import { BcryptHasherImpl } from '../../../src/infrastructure/service/BcryptHasherImpl';
 import { TransactionManagerImpl } from '../../../src/infrastructure/database/TransactionManagerImpl';
@@ -13,7 +13,7 @@ describe('RegisterUseCase (Integration)', () => {
 
   test('debe registrar un nuevo paciente', async () => {
     const registerUseCase = new RegisterUseCase({
-      usuarioRepository: new UsuarioRepositoryMySQL(),
+      usuarioRepository: new MySQLUserRepository(),
       pacienteRepository: new PacienteRepositoryMySQL(),
       bcryptHasher: new BcryptHasherImpl(),
       transactionManager: new TransactionManagerImpl(),
