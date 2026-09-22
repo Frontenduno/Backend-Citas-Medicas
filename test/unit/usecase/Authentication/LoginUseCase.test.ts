@@ -47,7 +47,7 @@ describe('LoginUseCase', () => {
       genero: 'Masculino',
     };
 
-    mockUsuarioRepository.findByEmail.mockResolvedValue(mockUsuario);
+    mockUsuarioRepository.findByEmail.mockResolvedValue(mockUsuario as any);
     mockBcryptHasher.compararContrasenas.mockResolvedValue(true);
     mockJwtGenerator.firmarCredenciales.mockReturnValue('token123');
 
@@ -92,7 +92,7 @@ describe('LoginUseCase', () => {
       genero: 'Masculino',
     };
 
-    mockUsuarioRepository.findByEmail.mockResolvedValue(mockUsuario);
+    mockUsuarioRepository.findByEmail.mockResolvedValue(mockUsuario as any);
     mockBcryptHasher.compararContrasenas.mockResolvedValue(false);
 
     await expect(loginUseCase.execute('test@mail.com', 'wrong')).rejects.toThrow(CredencialesIncorrectasException);
