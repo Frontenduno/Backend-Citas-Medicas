@@ -2,7 +2,11 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  collectCoverageFrom: ['src/**/*.ts'],
-  coverageDirectory: 'coverage',
-  testMatch: ['**/test/**/*.test.ts'],
+  roots: ['<rootDir>/test'],
+  testMatch: ['**/*.test.ts'],
+  transform: {
+    '^.+\\.tsx?$': ['ts-jest', { tsconfig: { esModuleInterop: true } }],
+  },
+  verbose: true,
 };
+

@@ -1,12 +1,12 @@
-import { pool } from '../database/PoolConexion';
-import { Usuario } from '../../domain/entity/Usuario';
-import { IUsuarioRepository } from '../../domain/repository/UsuarioRepository';
+import { pool } from "../database/PoolConexion";
+import { Usuario } from "../../domain/entity/Usuario";
+import { IUsuarioRepository } from "../../domain/repository/UsuarioRepository";
 
 export class UsuarioRepositoryMySQL implements IUsuarioRepository {
   async existsByEmail(email: string, connection?: any): Promise<boolean> {
     const executor = connection || pool;
     const [rows] = await executor.execute(
-      'SELECT idUsuario FROM Usuario WHERE correo = ?',
+      "SELECT idUsuario FROM Usuario WHERE correo = ?",
       [email],
     );
     return rows.length > 0;
@@ -15,7 +15,7 @@ export class UsuarioRepositoryMySQL implements IUsuarioRepository {
   async findByEmail(email: string, connection?: any) {
     const executor = connection || pool;
     const [rows] = await executor.execute(
-      'SELECT * FROM Usuario WHERE correo = ?',
+      "SELECT * FROM Usuario WHERE correo = ?",
       [email],
     );
     if (rows.length === 0) {
