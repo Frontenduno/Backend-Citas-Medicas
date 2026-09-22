@@ -1,5 +1,5 @@
 import { createAuthController } from "./src/presenter/controllers/AuthController";
-import { createAuthRoutes } from "./src/presenter/routes/authRoutes";
+import { createAuthRoutes } from "./src/presenter/routes/auth.routes";
 import { RegisterUseCase } from "./src/application/usecases/Authentication/RegisterUseCase";
 import { LoginUseCase } from "./src/application/usecases/Authentication/LoginUseCase";
 import { UsuarioRepositoryMySQL } from "./src/infrastructure/repositories/UserRepositoryMySQL";
@@ -41,12 +41,12 @@ export function createCompositionRoot() {
     credencialesIncorrectasException: new CredencialesIncorrectasException(),
   });
 
-  const registrarContactoEmergenciaUseCase = 
-  new RegistrarContactoEmergenciaUseCase(
-    contactoEmergenciaRepository,
-    transactionManager,
-    pacienteRepository,
-  );
+  const registrarContactoEmergenciaUseCase =
+    new RegistrarContactoEmergenciaUseCase(
+      contactoEmergenciaRepository,
+      transactionManager,
+      pacienteRepository,
+    );
 
   //controllers
   const authController = createAuthController({
