@@ -1,7 +1,10 @@
-export class CorreoRegistradoException extends Error {
-  constructor() {
-    super('Este correo ya existe en esta plataforma...');
-    this.name = 'CorreoRegistradoException';
-    Error.captureStackTrace(this, CorreoRegistradoException);
+import { AppException } from './AppException';
+
+export class CorreoRegistradoException extends AppException {
+  readonly code = 'CORREO_NO_REGISTRADO';
+  readonly httpStatus = 404;
+
+  constructor(message: string = 'Este correo no existe en esta plataforma...') {
+    super(message);
   }
 }
