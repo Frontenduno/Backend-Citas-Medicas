@@ -12,7 +12,7 @@ export class UsuarioRepositoryMySQL implements IUsuarioRepository {
     return rows.length > 0;
   }
 
-  async findByEmail(email: string, connection?: any) {
+  async findByEmail(email: string, connection?: any): Promise<Usuario | null> {
     const executor = connection || pool;
     const [rows] = await executor.execute(
       'SELECT * FROM Usuario WHERE correo = ?',
@@ -32,6 +32,8 @@ export class UsuarioRepositoryMySQL implements IUsuarioRepository {
       userResult.fecha_nacimiento,
       userResult.genero,
       userResult.rol,
+      Boolean(userResult.correo_verificado),
+      userResult.fecha_verificacion_correo ? new Date(userResult.fecha_verificacion_correo) : null
     );
   }
 
@@ -51,5 +53,26 @@ export class UsuarioRepositoryMySQL implements IUsuarioRepository {
       ],
     );
     return result.insertId;
+  }
+
+  async guardar(usuario: Usuario, connection?: any): Promise<void> {
+    const executor = connection || pool;
+    await executor.execute(
+      `UPDATE Usuario SET contrasena = ?, correo_verificado = ?, fecha_verificacion_correo = ? WHERE idUsuario = ?`,
+      [
+        usuario.contrasena,
+        usuario.correoVerificado ? 1 : 0,
+        usuario.fechaVerificacionCorreo,
+        usuario.idUsuario
+      ]
+    );
+  }
+
+  async marcarCorreoVerificado(usuarioId: number, connection?: any): Promise<void> {
+    const executor = connection || pool;
+    await executor.execute(
+      `UPDATE Usuario SET correo_verificado = TRUE, fecha_verificacion_correo = NOW() WHERE idUsuario = ?`,
+      [usuarioId]
+    );
   }
 }
