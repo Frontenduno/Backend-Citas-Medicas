@@ -1,5 +1,5 @@
 import { LoginUseCase, LoginUseCaseDependencies } from '../../../../src/application/usecases/Authentication/LoginUseCase';
-import { IUsuarioRepository } from '../../../../src/domain/repositories/UsuarioRepository';
+import { IUsuarioRepository } from '../../../../src/domain/repository/UsuarioRepository';
 import { IBcryptHasher } from '../../../../src/application/ports/BcryptHasher';
 import { IJwtGenerator } from '../../../../src/application/ports/JwtGenerator';
 import { CredencialesIncorrectasException } from '../../../../src/application/exception/CredencialesIncorrectasException';

@@ -1,5 +1,5 @@
 import { MySQLUserRepository } from '../../../src/infrastructure/repositories/MySQLUserRepository';
-import { Usuario } from '../../../src/domain/entities/Usuario';
+import { Usuario } from '../../../src/domain/entity/Usuario';
 import { closeConnection, getConnection } from '../../../src/infrastructure/database/PoolConexion';
 
 describe('UsuarioRepositoryMySQL', () => {

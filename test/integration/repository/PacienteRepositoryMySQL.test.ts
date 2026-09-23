@@ -1,7 +1,7 @@
 import { PacienteRepositoryMySQL } from '../../../src/infrastructure/repositories/PacienteRepositoryMySQL';
-import { Paciente } from '../../../src/domain/entities/Paciente';
+import { Paciente } from '../../../src/domain/entity/Paciente';
 import { MySQLUserRepository } from '../../../src/infrastructure/repositories/MySQLUserRepository';
-import { Usuario } from '../../../src/domain/entities/Usuario';
+import { Usuario } from '../../../src/domain/entity/Usuario';
 import { closeConnection, getConnection } from '../../../src/infrastructure/database/PoolConexion';
 
 describe('PacienteRepositoryMySQL', () => {

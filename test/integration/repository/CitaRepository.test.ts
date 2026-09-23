@@ -1,7 +1,7 @@
 import { MySQLCitaRepository } from '../../../src/infrastructure/repositories/MySQLCitaRepository';
 import { closeConnection } from '../../../src/infrastructure/database/PoolConexion';
-import { Cita } from '../../../src/domain/entities/Cita';
-import { TicketCita } from '../../../src/domain/entities/TicketCita';
+import { Cita } from '../../../src/domain/entity/Cita';
+import { TicketCita } from '../../../src/domain/entity/TicketCita';
 
 describe('Test de los métodos de MySQLCitaRepository (TypeScript)', () => {
   const repository = new MySQLCitaRepository();
