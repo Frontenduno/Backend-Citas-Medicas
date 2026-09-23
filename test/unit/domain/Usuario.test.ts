@@ -1,4 +1,4 @@
-import { Usuario } from '../../../src/domain/entity/Usuario';
+import { Usuario } from '../../../src/domain/entities/Usuario';
 
 describe('Usuario', () => {
   it('debe crear una instancia de Usuario con los valores proporcionados', () => {

@@ -1,3 +1,4 @@
 export interface IJwtGenerator {
-  firmarCredenciales(payload: { correo: string; rol: string }, tiempoExpiracion?: string): string;
+  firmarCredenciales(payload: { id: number; correo: string; rol: string }, tiempoExpiracion?: string): string;
+  verificarToken(token: string): { id: number; correo: string; rol: string };
 }

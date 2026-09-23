@@ -1,33 +1,17 @@
-export class Usuario {
-  idUsuario?: number;
-  contrasena: string;
-  nombres: string;
-  apellidos: string;
-  correo: string;
-  telefono: string;
-  fecha_nacimiento: string;
-  genero: string;
-  rol: string;
+export type RolUsuario = 'Paciente' | 'Medico' | 'Administrador';
+export type GeneroUsuario = 'Masculino' | 'Femenino' | 'Otro';
 
+export class Usuario {
   constructor(
-    idUsuario: number | null,
-    contrasena: string,
-    nombres: string,
-    apellidos: string,
-    correo: string,
-    telefono: string,
-    fecha_nacimiento: string,
-    genero: string,
-    rol: string,
-  ) {
-    this.idUsuario = idUsuario ?? undefined;
-    this.contrasena = contrasena;
-    this.nombres = nombres;
-    this.apellidos = apellidos;
-    this.correo = correo;
-    this.telefono = telefono;
-    this.fecha_nacimiento = fecha_nacimiento;
-    this.genero = genero;
-    this.rol = rol;
-  }
+    public readonly idUsuario: number | null,
+    public readonly contrasena: string,
+    public readonly nombres: string,
+    public readonly apellidos: string,
+    public readonly correo: string,
+    public readonly telefono: string | null,
+    public readonly fecha_nacimiento: string,
+    public readonly genero: GeneroUsuario | string,
+    public readonly rol: RolUsuario | string,
+  ) {}
 }
+

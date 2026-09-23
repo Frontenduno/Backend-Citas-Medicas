@@ -1,9 +1,10 @@
-import { Paciente } from "../../../src/domain/entity/Paciente";
-import { IPacienteRepository } from "../../../src/domain/repository/PacienteRepository";
+import { Paciente } from "../../../src/domain/entities/Paciente";
+import { IPacienteRepository } from "../../../src/domain/repositories/PacienteRepository";
 
 describe("PacienteRepository", () => {
   const repository: IPacienteRepository = {
       create: jest.fn().mockImplementation(()=>1),
+      findByIdUsuario: jest.fn()
     };
 
   it("debe registrar paciente", async () => {
