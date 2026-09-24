@@ -1,4 +1,4 @@
-import { ICitaRepository, CitaWithTicket } from '../../../domain/repositories/ICitaRepository';
+import { ICitaRepository, CitaWithTicket } from '../../../domain/repository/ICitaRepository';
 
 export class GetCitasByPacienteUseCase {
   constructor(private readonly citaRepository: ICitaRepository) {}

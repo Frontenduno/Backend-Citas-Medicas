@@ -1,7 +1,7 @@
-import { Cita } from '../entities/Cita';
-import { TicketCita, EstadoTicket } from '../entities/TicketCita';
-import { Horario } from '../entities/Horario';
-import { DetallesHorario } from '../entities/DetallesHorario';
+import { Cita } from '../entity/Cita';
+import { TicketCita, EstadoTicket } from '../entity/TicketCita';
+import { Horario } from '../entity/Horario';
+import { DetallesHorario } from '../entity/DetallesHorario';
 
 export interface CitaWithTicket {
   cita: Cita;

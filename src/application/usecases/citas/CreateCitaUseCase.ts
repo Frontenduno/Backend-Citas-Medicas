@@ -1,7 +1,7 @@
-import { ICitaRepository } from '../../../domain/repositories/ICitaRepository';
+import { ICitaRepository } from '../../../domain/repository/ICitaRepository';
 import { CreateCitaDTO } from '../../dtos/CreateCitaDTO';
-import { Cita } from '../../../domain/entities/Cita';
-import { TicketCita } from '../../../domain/entities/TicketCita';
+import { Cita } from '../../../domain/entity/Cita';
+import { TicketCita } from '../../../domain/entity/TicketCita';
 
 export class CreateCitaUseCase {
   constructor(private readonly citaRepository: ICitaRepository) {}

@@ -1,5 +1,5 @@
-import { Paciente } from "../../../src/domain/entities/Paciente";
-import { IPacienteRepository } from "../../../src/domain/repositories/PacienteRepository";
+import { Paciente } from "../../../src/domain/entity/Paciente";
+import { IPacienteRepository } from "../../../src/domain/repository/PacienteRepository";
 
 describe("PacienteRepository", () => {
   const repository: IPacienteRepository = {

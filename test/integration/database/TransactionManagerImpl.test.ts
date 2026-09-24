@@ -2,7 +2,7 @@
 import { TransactionManagerImpl } from '../../../src/infrastructure/database/TransactionManagerImpl';
 import { closeConnection } from '../../../src/infrastructure/database/PoolConexion';
 import { MySQLUserRepository } from '../../../src/infrastructure/repositories/MySQLUserRepository';
-import { Usuario } from '../../../src/domain/entities/Usuario';
+import { Usuario } from '../../../src/domain/entity/Usuario';
 
 describe('TransactionManagerImpl', () => {
   afterAll(async () => {

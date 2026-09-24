@@ -1,7 +1,7 @@
-import { IContactoEmergenciaRepository } from "../../../domain/repositories/ContactoEmergenciaRepository";
-import { ContactoEmergencia } from "../../../domain/entities/ContactoEmergencia";
+import { IContactoEmergenciaRepository } from "../../../domain/repository/ContactoEmergenciaRepository";
+import { ContactoEmergencia } from "../../../domain/entity/ContactoEmergencia";
 import { ITransactionManager } from "../../ports/TransactionManager";
-import { IPacienteRepository } from "../../../domain/repositories/PacienteRepository";
+import { IPacienteRepository } from "../../../domain/repository/PacienteRepository";
 export class RegistrarContactoEmergenciaUseCase {
   contactoEmergenciaRepository: IContactoEmergenciaRepository;
   pacienteRepository: IPacienteRepository;

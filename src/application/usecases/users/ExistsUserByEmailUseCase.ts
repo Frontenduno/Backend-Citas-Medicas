@@ -1,4 +1,4 @@
-import { IUsuarioRepository } from '../../../domain/repositories/UsuarioRepository';
+import { IUsuarioRepository } from '../../../domain/repository/UsuarioRepository';
 
 export class ExistsUserByEmailUseCase {
   constructor(private readonly userRepository: IUsuarioRepository) {}

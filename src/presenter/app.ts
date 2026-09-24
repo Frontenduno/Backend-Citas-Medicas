@@ -1,6 +1,6 @@
 import express, { Application, Request, Response } from 'express';
 import morgan from 'morgan';
-import citaRoutes from './routes/citaRoutes';
+import citaRoutes from './routes/cita.routes';
 
 export function createApp(): Application {
   const app: Application = express();

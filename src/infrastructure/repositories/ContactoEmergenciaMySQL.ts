@@ -1,5 +1,5 @@
-import { ContactoEmergencia } from "../../domain/entities/ContactoEmergencia";
-import { IContactoEmergenciaRepository } from "../../domain/repositories/ContactoEmergenciaRepository";
+import { ContactoEmergencia } from "../../domain/entity/ContactoEmergencia";
+import { IContactoEmergenciaRepository } from "../../domain/repository/ContactoEmergenciaRepository";
 import { pool } from "../database/PoolConexion";
 
 export class ContactoEmergenciaMySQL implements IContactoEmergenciaRepository {

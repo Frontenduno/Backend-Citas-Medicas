@@ -3,7 +3,7 @@ import { MySQLUserRepository } from '../../../src/infrastructure/repositories/My
 import { BcryptHasherImpl } from '../../../src/infrastructure/service/BcryptHasherImpl';
 import { JwtGeneratorImpl } from '../../../src/infrastructure/service/JwtGeneratorImpl';
 import { CredencialesIncorrectasException } from '../../../src/application/exception/CredencialesIncorrectasException';
-import { Usuario } from '../../../src/domain/entities/Usuario';
+import { Usuario } from '../../../src/domain/entity/Usuario';
 import { closeConnection } from '../../../src/infrastructure/database/PoolConexion';
 
 describe('LoginUseCase (Integration)', () => {

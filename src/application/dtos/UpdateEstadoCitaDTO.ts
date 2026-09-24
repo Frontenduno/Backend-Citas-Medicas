@@ -1,4 +1,4 @@
-import { EstadoTicket } from '../../domain/entities/TicketCita';
+import { EstadoTicket } from '../../domain/entity/TicketCita';
 
 export interface UpdateEstadoCitaDTO {
   idTicketCita: number;

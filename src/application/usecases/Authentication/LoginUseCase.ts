@@ -1,4 +1,4 @@
-import { IUsuarioRepository } from "../../../domain/repositories/UsuarioRepository";
+import { IUsuarioRepository } from "../../../domain/repository/UsuarioRepository";
 import { IBcryptHasher } from "../../ports/BcryptHasher";
 import { IJwtGenerator } from "../../ports/JwtGenerator";
 import { CredencialesIncorrectasException } from "../../exception/CredencialesIncorrectasException";

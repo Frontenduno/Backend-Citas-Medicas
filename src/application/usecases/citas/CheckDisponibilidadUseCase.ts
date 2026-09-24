@@ -1,4 +1,4 @@
-import { ICitaRepository, DisponibilidadResult } from '../../../domain/repositories/ICitaRepository';
+import { ICitaRepository, DisponibilidadResult } from '../../../domain/repository/ICitaRepository';
 
 export class CheckDisponibilidadUseCase {
   constructor(private readonly citaRepository: ICitaRepository) {}

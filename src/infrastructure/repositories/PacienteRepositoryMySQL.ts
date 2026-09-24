@@ -1,6 +1,6 @@
 import { pool } from "../database/PoolConexion";
-import { Paciente } from "../../domain/entities/Paciente";
-import { IPacienteRepository } from "../../domain/repositories/PacienteRepository";
+import { Paciente } from "../../domain/entity/Paciente";
+import { IPacienteRepository } from "../../domain/repository/PacienteRepository";
 
 export class PacienteRepositoryMySQL implements IPacienteRepository {
   async create(paciente: Paciente, connection?: any): Promise<number> {

@@ -1,6 +1,6 @@
 import { pool } from "../database/PoolConexion";
-import { Usuario } from "../../domain/entities/Usuario";
-import { IUsuarioRepository } from "../../domain/repositories/UsuarioRepository";
+import { Usuario } from "../../domain/entity/Usuario";
+import { IUsuarioRepository } from "../../domain/repository/UsuarioRepository";
 
 export class MySQLUserRepository implements IUsuarioRepository {
   async existsByEmail(email: string, connection?: any): Promise<boolean> {

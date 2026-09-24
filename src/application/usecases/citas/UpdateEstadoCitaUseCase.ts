@@ -1,4 +1,4 @@
-import { ICitaRepository } from '../../../domain/repositories/ICitaRepository';
+import { ICitaRepository } from '../../../domain/repository/ICitaRepository';
 import { UpdateEstadoCitaDTO } from '../../dtos/UpdateEstadoCitaDTO';
 
 export class UpdateEstadoCitaUseCase {

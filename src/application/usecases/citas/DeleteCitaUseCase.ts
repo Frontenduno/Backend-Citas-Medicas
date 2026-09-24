@@ -1,4 +1,4 @@
-import { ICitaRepository } from '../../../domain/repositories/ICitaRepository';
+import { ICitaRepository } from '../../../domain/repository/ICitaRepository';
 
 export class DeleteCitaUseCase {
   constructor(private readonly citaRepository: ICitaRepository) {}

@@ -18,7 +18,7 @@ import { createPacienteController } from "./src/presenter/controllers/PacienteCo
 import { createPacienteRoutes } from "./src/presenter/routes/paciente.routes";
 
 import { MySQLCitaRepository } from "./src/infrastructure/repositories/MySQLCitaRepository";
-import { ICitaRepository } from "./src/domain/repositories/ICitaRepository";
+import { ICitaRepository } from "./src/domain/repository/ICitaRepository";
 import { CreateCitaUseCase } from "./src/application/usecases/citas/CreateCitaUseCase";
 import { GetCitaByIdUseCase } from "./src/application/usecases/citas/GetCitaByIdUseCase";
 import { GetCitasByPacienteUseCase } from "./src/application/usecases/citas/GetCitasByPacienteUseCase";
@@ -28,10 +28,10 @@ import { UpdateEstadoCitaUseCase } from "./src/application/usecases/citas/Update
 import { DeleteCitaUseCase } from "./src/application/usecases/citas/DeleteCitaUseCase";
 import { CheckDisponibilidadUseCase } from "./src/application/usecases/citas/CheckDisponibilidadUseCase";
 import { CitaController } from "./src/presenter/controllers/CitaController";
-import { createCitaRouter } from "./src/presenter/routes/citaRoutes";
+import { createCitaRouter } from "./src/presenter/routes/cita.routes";
 import { FindUserByEmailUseCase } from "./src/application/usecases/users/FindUserByEmailUseCase";
 import { ExistsUserByEmailUseCase } from "./src/application/usecases/users/ExistsUserByEmailUseCase";
-import { IUsuarioRepository } from "./src/domain/repositories/UsuarioRepository";
+import { IUsuarioRepository } from "./src/domain/repository/UsuarioRepository";
 
 export function createCompositionRoot() {
   // Repositories (Infrastructure)

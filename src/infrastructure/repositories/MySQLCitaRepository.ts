@@ -1,14 +1,14 @@
 import { RowDataPacket, ResultSetHeader } from 'mysql2/promise';
 import { getConnection } from '../database/PoolConexion';
-import { Cita } from '../../domain/entities/Cita';
-import { TicketCita, EstadoTicket } from '../../domain/entities/TicketCita';
-import { Horario } from '../../domain/entities/Horario';
-import { DetallesHorario, DiaSemana } from '../../domain/entities/DetallesHorario';
+import { Cita } from '../../domain/entity/Cita';
+import { TicketCita, EstadoTicket } from '../../domain/entity/TicketCita';
+import { Horario } from '../../domain/entity/Horario';
+import { DetallesHorario, DiaSemana } from '../../domain/entity/DetallesHorario';
 import {
   ICitaRepository,
   CitaWithTicket,
   DisponibilidadResult,
-} from '../../domain/repositories/ICitaRepository';
+} from '../../domain/repository/ICitaRepository';
 
 interface CitaRow extends RowDataPacket {
   idCita: number;

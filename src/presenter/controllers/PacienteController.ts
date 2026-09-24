@@ -1,7 +1,7 @@
 import { RegistrarContactoEmergenciaUseCase } from "../../application/usecases/Paciente/RegistrarContactoEmergenciaUseCase";
 import { IJwtGenerator } from "../../application/ports/JwtGenerator";
 import { Request, Response } from "express";
-import { ContactoEmergencia } from "../../domain/entities/ContactoEmergencia";
+import { ContactoEmergencia } from "../../domain/entity/ContactoEmergencia";
 
 export function createPacienteController(
   registrarContactoUseCase: RegistrarContactoEmergenciaUseCase,
