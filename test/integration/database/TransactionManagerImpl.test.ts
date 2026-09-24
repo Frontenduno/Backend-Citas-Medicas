@@ -1,7 +1,7 @@
 import { TransactionManagerImpl } from '../../../src/infrastructure/database/TransactionManagerImpl';
 import { closeConnection } from '../../../src/infrastructure/database/PoolConexion';
-import { UsuarioRepositoryMySQL } from '../../../src/infrastructure/repositories/UserRepositoryMySQL';
-import { Usuario } from '../../../src/domain/entity/Usuario';
+import { MySQLUserRepository } from '../../../src/infrastructure/repositories/MySQLUserRepository';
+import { Usuario } from '../../../src/domain/entities/Usuario';
 
 describe('TransactionManagerImpl', () => {
   afterAll(async () => {
@@ -10,7 +10,7 @@ describe('TransactionManagerImpl', () => {
 
   test('debe hacer rollback cuando ocurre un error durante la operacion', async () => {
     const manager = new TransactionManagerImpl();
-    const usuarioRepository = new UsuarioRepositoryMySQL();
+    const usuarioRepository = new MySQLUserRepository();
     const email = `rollback_${Date.now()}@test.com`;
 
     const usuario = new Usuario(

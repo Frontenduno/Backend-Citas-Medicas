@@ -1,7 +1,7 @@
-import { Usuario } from '../../../domain/entity/Usuario';
-import { Paciente } from '../../../domain/entity/Paciente';
-import { IUsuarioRepository } from '../../../domain/repository/UsuarioRepository';
-import { IPacienteRepository } from '../../../domain/repository/PacienteRepository';
+import { Usuario } from '../../../domain/entities/Usuario';
+import { Paciente } from '../../../domain/entities/Paciente';
+import { IUsuarioRepository } from '../../../domain/repositories/UsuarioRepository';
+import { IPacienteRepository } from '../../../domain/repositories/PacienteRepository';
 import { IBcryptHasher } from '../../ports/BcryptHasher';
 import { ITransactionManager } from '../../ports/TransactionManager';
 import { CorreoRegistradoException } from '../../exception/CorreoRegistradoException';

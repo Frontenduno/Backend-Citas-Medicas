@@ -1,11 +1,11 @@
 import { RegisterUseCase, NuevoPacienteRequest, RegisterUseCaseDependencies } from '../../../../src/application/usecases/Authentication/RegisterUseCase';
-import { IUsuarioRepository } from '../../../../src/domain/repository/UsuarioRepository';
-import { IPacienteRepository } from '../../../../src/domain/repository/PacienteRepository';
+import { IUsuarioRepository } from '../../../../src/domain/repositories/UsuarioRepository';
+import { IPacienteRepository } from '../../../../src/domain/repositories/PacienteRepository';
 import { IBcryptHasher } from '../../../../src/application/ports/BcryptHasher';
 import { ITransactionManager } from '../../../../src/application/ports/TransactionManager';
 import { CorreoRegistradoException } from '../../../../src/application/exception/CorreoRegistradoException';
-import { Usuario } from '../../../../src/domain/entity/Usuario';
-import { Paciente } from '../../../../src/domain/entity/Paciente';
+import { Usuario } from '../../../../src/domain/entities/Usuario';
+import { Paciente } from '../../../../src/domain/entities/Paciente';
 
 describe('RegisterUseCase', () => {
   let registerUseCase: RegisterUseCase;
