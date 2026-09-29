@@ -1,8 +1,9 @@
-import nodemailer from 'nodemailer';
+import nodemailer from 'nodemailer/lib/nodemailer';
 import { IEmailSender } from '../../application/ports/IEmailSender';
+import { Transporter } from 'nodemailer';
 
 export class GmailEmailSender implements IEmailSender {
-  private transporter: nodemailer.Transporter;
+  private transporter: Transporter;
 
   constructor() {
     this.transporter = nodemailer.createTransport({

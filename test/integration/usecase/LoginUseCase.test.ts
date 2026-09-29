@@ -28,7 +28,7 @@ describe('LoginUseCase (Integration)', () => {
 
     const hashedPassword = await bcryptHasher.encriptarContrasena(contrasena);
     await usuarioRepository.create(
-      new Usuario(null, hashedPassword, 'Juan', 'Perez', email, '987654321', '1990-01-01', 'Masculino', 'PACIENTE'),
+      new Usuario(null, hashedPassword, 'Juan', 'Perez', email, '987654321', null, '1990-01-01', 'Masculino', 'PACIENTE', true),
     );
 
     const result = await loginUseCase.execute(email, contrasena);

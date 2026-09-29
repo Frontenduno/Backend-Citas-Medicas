@@ -46,9 +46,11 @@ describe('UsuarioRepositoryMySQL', () => {
         'Rollback',
         email,
         '999999999',
+        null,
         '1990-01-01',
         'Masculino',
         'PACIENTE',
+        false,
       );
 
       const result = await repository.create(usuario, connection);

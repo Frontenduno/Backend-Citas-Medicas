@@ -1,6 +1,3 @@
-import express, { Application } from "express";
-import morgan from "morgan";
-
 import { createAuthController } from "./src/presenter/controllers/AuthController";
 import { createAuthRoutes } from "./src/presenter/routes/auth.routes";
 import { RegisterUseCase } from "./src/application/usecases/Authentication/RegisterUseCase";

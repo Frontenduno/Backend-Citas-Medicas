@@ -3,6 +3,8 @@ import { IUsuarioRepository } from '../../../../src/domain/repository/UsuarioRep
 import { IBcryptHasher } from '../../../../src/application/ports/BcryptHasher';
 import { IJwtGenerator } from '../../../../src/application/ports/JwtGenerator';
 import { CredencialesIncorrectasException } from '../../../../src/application/exception/CredencialesIncorrectasException';
+import { CorreoNoVerificadoException } from '../../../../src/application/exception/CorreoNoVerificadoException';
+import { Usuario } from '../../../../src/domain/entity/Usuario';
 
 describe('LoginUseCase', () => {
   let loginUseCase: LoginUseCase;
@@ -10,6 +12,7 @@ describe('LoginUseCase', () => {
   let mockBcryptHasher: jest.Mocked<IBcryptHasher>;
   let mockJwtGenerator: jest.Mocked<IJwtGenerator>;
   let credencialesIncorrectasException: CredencialesIncorrectasException;
+  let correoNoVerificadoException: CorreoNoVerificadoException;
 
   beforeEach(() => {
     mockUsuarioRepository = {
@@ -25,27 +28,31 @@ describe('LoginUseCase', () => {
     } as unknown as jest.Mocked<IJwtGenerator>;
 
     credencialesIncorrectasException = new CredencialesIncorrectasException();
+    correoNoVerificadoException = new CorreoNoVerificadoException();
 
     loginUseCase = new LoginUseCase({
       usuarioRepository: mockUsuarioRepository,
       bcryptHasher: mockBcryptHasher,
       jwtGenerator: mockJwtGenerator,
       credencialesIncorrectasException,
+      correoNoVerificadoException,
     } as LoginUseCaseDependencies);
   });
 
   it('debe autenticar un usuario correctamente', async () => {
-    const mockUsuario = {
-      idUsuario: 1,
-      correo: 'test@mail.com',
-      contrasena: 'hashed',
-      rol: 'PACIENTE',
-      nombres: 'Juan',
-      apellidos: 'Perez',
-      telefono: '999999999',
-      fecha_nacimiento: '1990-01-01',
-      genero: 'Masculino',
-    };
+    const mockUsuario = new Usuario(
+      1,
+      'hashed',
+      'Juan',
+      'Perez',
+      'test@mail.com',
+      '999999999',
+      '88888888',
+      '1990-01-01',
+      'Masculino',
+      'PACIENTE',
+      true,
+    );
 
     mockUsuarioRepository.findUsuariobyEmail.mockResolvedValue(mockUsuario);
     mockBcryptHasher.compararContrasenas.mockResolvedValue(true);
@@ -80,17 +87,19 @@ describe('LoginUseCase', () => {
   });
 
   it('debe lanzar CredencialesIncorrectasException si la contrasena es incorrecta', async () => {
-    const mockUsuario = {
-      idUsuario: 1,
-      correo: 'test@mail.com',
-      contrasena: 'hashed',
-      rol: 'PACIENTE',
-      nombres: 'Juan',
-      apellidos: 'Perez',
-      telefono: '999999999',
-      fecha_nacimiento: '1990-01-01',
-      genero: 'Masculino',
-    };
+    const mockUsuario = new Usuario(
+      1,
+      'hashed',
+      'Juan',
+      'Perez',
+      'test@mail.com',
+      '999999999',
+      '88888888',
+      '1990-01-01',
+      'Masculino',
+      'PACIENTE',
+      true,
+    );
 
     mockUsuarioRepository.findUsuariobyEmail.mockResolvedValue(mockUsuario);
     mockBcryptHasher.compararContrasenas.mockResolvedValue(false);
