@@ -5,6 +5,7 @@ import { AuthControllerDependencies } from '../controllers/AuthController';
 export function createAuthRoutes(authController: ReturnType<typeof createAuthController>) {
   const router = express.Router();
   router.post('/register', authController.register);
+  router.post('/verificar-correo', authController.verificarCorreo);
   router.post('/login', authController.login);
   return router;
 }

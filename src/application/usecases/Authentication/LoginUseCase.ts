@@ -2,12 +2,14 @@ import { IUsuarioRepository } from "../../../domain/repository/UsuarioRepository
 import { IBcryptHasher } from "../../ports/BcryptHasher";
 import { IJwtGenerator } from "../../ports/JwtGenerator";
 import { CredencialesIncorrectasException } from "../../exception/CredencialesIncorrectasException";
+import { CorreoNoVerificadoException } from "../../exception/CorreoNoVerificadoException";
 
 export interface LoginUseCaseDependencies {
   usuarioRepository: IUsuarioRepository;
   bcryptHasher: IBcryptHasher;
   jwtGenerator: IJwtGenerator;
   credencialesIncorrectasException: CredencialesIncorrectasException;
+  correoNoVerificadoException: CorreoNoVerificadoException;
 }
 
 export interface LoginUsuarioInfo {
@@ -28,6 +30,7 @@ export class LoginUseCase {
   private bcryptHasher: IBcryptHasher;
   private jwtGenerator: IJwtGenerator;
   private credencialesIncorrectasException: CredencialesIncorrectasException;
+  private correoNoVerificadoException: CorreoNoVerificadoException;
 
   constructor(deps: LoginUseCaseDependencies) {
     this.usuarioRepository = deps.usuarioRepository;
@@ -35,6 +38,7 @@ export class LoginUseCase {
     this.jwtGenerator = deps.jwtGenerator;
     this.credencialesIncorrectasException =
       deps.credencialesIncorrectasException;
+    this.correoNoVerificadoException = deps.correoNoVerificadoException;
   }
 
   async execute(
@@ -51,6 +55,11 @@ export class LoginUseCase {
       ))
     ) {
       throw this.credencialesIncorrectasException;
+    }
+
+    // Verificar que el correo esté verificado
+    if (!usuario.verificado) {
+      throw this.correoNoVerificadoException;
     }
 
     const payload = {

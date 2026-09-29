@@ -5,13 +5,18 @@ import { createAuthController } from "./src/presenter/controllers/AuthController
 import { createAuthRoutes } from "./src/presenter/routes/auth.routes";
 import { RegisterUseCase } from "./src/application/usecases/Authentication/RegisterUseCase";
 import { LoginUseCase } from "./src/application/usecases/Authentication/LoginUseCase";
+import { VerificarCorreoUseCase } from "./src/application/usecases/Authentication/VerificarCorreoUseCase";
 import { MySQLUserRepository } from "./src/infrastructure/repositories/MySQLUserRepository";
 import { PacienteRepositoryMySQL } from "./src/infrastructure/repositories/PacienteRepositoryMySQL";
+import { MySQLCodigoVerificacionRepository } from "./src/infrastructure/repositories/MySQLCodigoVerificacionRepository";
 import { JwtGeneratorImpl } from "./src/infrastructure/service/JwtGeneratorImpl";
 import { BcryptHasherImpl } from "./src/infrastructure/service/BcryptHasherImpl";
+import { GmailEmailSender } from "./src/infrastructure/service/GmailEmailSender";
 import { TransactionManagerImpl } from "./src/infrastructure/database/TransactionManagerImpl";
 import { CredencialesIncorrectasException } from "./src/application/exception/CredencialesIncorrectasException";
 import { CorreoRegistradoException } from "./src/application/exception/CorreoRegistradoException";
+import { CodigoVerificacionInvalidoException } from "./src/application/exception/CodigoVerificacionInvalidoException";
+import { CorreoNoVerificadoException } from "./src/application/exception/CorreoNoVerificadoException";
 import { ContactoEmergenciaMySQL } from "./src/infrastructure/repositories/ContactoEmergenciaMySQL";
 import { RegistrarContactoEmergenciaUseCase } from "./src/application/usecases/Paciente/RegistrarContactoEmergenciaUseCase";
 import { createPacienteController } from "./src/presenter/controllers/PacienteController";
@@ -39,11 +44,13 @@ export function createCompositionRoot() {
   const pacienteRepository = new PacienteRepositoryMySQL();
   const contactoEmergenciaRepository = new ContactoEmergenciaMySQL();
   const citaRepository: ICitaRepository = new MySQLCitaRepository();
+  const codigoVerificacionRepository = new MySQLCodigoVerificacionRepository();
 
   // Ports / Services
   const jwtGenerator = new JwtGeneratorImpl();
   const bcryptHasher = new BcryptHasherImpl();
   const transactionManager = new TransactionManagerImpl();
+  const emailSender = new GmailEmailSender();
 
   // Use Cases - Citas (Application)
   const createCitaUseCase = new CreateCitaUseCase(citaRepository);
@@ -63,9 +70,18 @@ export function createCompositionRoot() {
   const registerUseCase = new RegisterUseCase({
     usuarioRepository,
     pacienteRepository,
+    codigoVerificacionRepository,
     bcryptHasher,
     transactionManager,
+    emailSender,
     correoRegistradoException: new CorreoRegistradoException(),
+  });
+
+  const verificarCorreoUseCase = new VerificarCorreoUseCase({
+    usuarioRepository,
+    codigoVerificacionRepository,
+    transactionManager,
+    codigoVerificacionInvalidoException: new CodigoVerificacionInvalidoException(),
   });
 
   const loginUseCase = new LoginUseCase({
@@ -73,6 +89,7 @@ export function createCompositionRoot() {
     bcryptHasher,
     jwtGenerator,
     credencialesIncorrectasException: new CredencialesIncorrectasException(),
+    correoNoVerificadoException: new CorreoNoVerificadoException(),
   });
 
   // Use Cases - Paciente (Application)
@@ -87,6 +104,7 @@ export function createCompositionRoot() {
   const authController = createAuthController({
     registerUseCase,
     loginUseCase,
+    verificarCorreoUseCase,
   });
   const pacienteController = createPacienteController(
     registrarContactoEmergenciaUseCase,

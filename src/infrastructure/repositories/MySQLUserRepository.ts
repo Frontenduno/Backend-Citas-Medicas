@@ -29,27 +29,39 @@ export class MySQLUserRepository implements IUsuarioRepository {
       userResult.apellidos,
       userResult.correo,
       userResult.telefono,
+      userResult.documento_identidad,
       userResult.fecha_nacimiento,
       userResult.genero,
       userResult.rol,
+      userResult.verificado === 1,
     );
   }
 
   async create(usuario: Usuario, connection?: any): Promise<number> {
     const executor = connection || pool;
     const [result] = await executor.execute(
-      `INSERT INTO Usuario (contrasena, nombres, apellidos, correo, telefono, fecha_nacimiento, genero, rol) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO Usuario (contrasena, nombres, apellidos, correo, telefono, documento_identidad, fecha_nacimiento, genero, rol, verificado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         usuario.contrasena,
         usuario.nombres,
         usuario.apellidos,
         usuario.correo,
         usuario.telefono,
+        usuario.documento_identidad,
         usuario.fecha_nacimiento,
         usuario.genero,
         usuario.rol,
+        usuario.verificado ? 1 : 0,
       ],
     );
     return result.insertId;
+  }
+
+  async updateVerificado(correo: string, verificado: boolean, connection?: any): Promise<void> {
+    const executor = connection || pool;
+    await executor.execute(
+      `UPDATE Usuario SET verificado = ? WHERE correo = ?`,
+      [verificado ? 1 : 0, correo],
+    );
   }
 }
