@@ -17,3 +17,23 @@ export interface IniciarSesionDTO {
     correo: string;
     contrasena: string;
 }
+
+export interface VerificarCodigoDTO {
+    correo: string;
+    codigo: string;
+}
+
+export interface ReenviarCodigoDTO {
+    correo: string;
+}
+
+export interface SolicitarRecuperacionDTO {
+    correo: string;
+}
+
+export interface RecuperarContrasenaDTO {
+    correo: string;
+    codigo: string;
+    nuevaContrasena: string;
+}
+

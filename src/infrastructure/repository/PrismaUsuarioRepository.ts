@@ -23,6 +23,8 @@ export class PrismaUsuarioRepository implements UsuarioRepository {
         ...(usuario.fecha_nacimiento && { fecha_nacimiento: usuario.fecha_nacimiento }),
         ...(usuario.rol && { rol: usuario.rol }),
         ...(usuario.verificado !== undefined && { verificado: usuario.verificado }),
+        ...(usuario.contrasena && { contrasena: usuario.contrasena }),
+
       },
     });
     return UsuarioMapper.toDomain(updated);
