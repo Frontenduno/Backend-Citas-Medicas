@@ -1,0 +1,164 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  idUsuario           Int      @id @default(autoincrement())
+  contrasena          String   @db.VarChar(255)
+  nombres             String   @db.VarChar(50)
+  apellidos           String   @db.VarChar(50)
+  correo              String   @unique(map: "Correo_UNIQUE") @db.VarChar(100)
+  telefono            String?  @db.VarChar(15)
+  documento_identidad String?  @unique(map: "documento_identidad_UNIQUE") @db.VarChar(20)
+  fecha_nacimiento    DateTime @db.Date
+  genero              String   @db.VarChar(20)
+  rol                 String   @db.VarChar(20)
+  verificado          Boolean  @default(false)
+  created_at          DateTime @default(now()) @db.Timestamp(0)
+  updated_at          DateTime @default(now()) @updatedAt @db.Timestamp(0)
+
+  paciente Paciente?
+  medico   Medico?
+
+  @@map("Usuario")
+}
+
+model Paciente {
+  idPaciente        Int     @id @default(autoincrement())
+  Usuario_idUsuario Int     @unique(map: "Usuario_idUsuario_UNIQUE")
+  usuario           Usuario @relation(fields: [Usuario_idUsuario], references: [idUsuario], onDelete: NoAction, onUpdate: NoAction, map: "fk_Paciente_Usuario1")
+
+  citas               Cita[]
+  contactosEmergencia ContactoEmergencia[]
+
+  @@index([Usuario_idUsuario], map: "fk_Paciente_Usuario1_idx")
+  @@map("Paciente")
+}
+
+model Especialidad {
+  idEspecialidad     Int      @id @default(autoincrement())
+  nombreEspecialidad String   @db.VarChar(45)
+  medicos            Medico[]
+
+  @@map("Especialidad")
+}
+
+model Medico {
+  idMedico                    Int          @id @default(autoincrement())
+  Usuario_idUsuario           Int          @unique(map: "Usuario_idUsuario_UNIQUE")
+  Especialidad_idEspecialidad Int
+  usuario                     Usuario      @relation(fields: [Usuario_idUsuario], references: [idUsuario], onDelete: NoAction, onUpdate: NoAction, map: "fk_Medico_Usuario1")
+  especialidad                Especialidad @relation(fields: [Especialidad_idEspecialidad], references: [idEspecialidad], onDelete: NoAction, onUpdate: NoAction, map: "fk_Medico_Especialidad1")
+
+  citas    Cita[]
+  horarios Horario[]
+
+  @@index([Especialidad_idEspecialidad], map: "fk_Medico_Especialidad1_idx")
+  @@index([Usuario_idUsuario], map: "fk_Medico_Usuario1_idx")
+  @@map("Medico")
+}
+
+model Cita {
+  idCita              Int      @id @default(autoincrement())
+  Paciente_idPaciente Int
+  Medico_idMedico     Int
+  Fecha               DateTime @db.Date
+  Hora                DateTime @db.Time(0)
+  motivo              String?  @db.MediumText
+
+  paciente Paciente @relation(fields: [Paciente_idPaciente], references: [idPaciente], onDelete: NoAction, onUpdate: NoAction, map: "fk_TicketCita_Paciente1")
+  medico   Medico   @relation(fields: [Medico_idMedico], references: [idMedico], onDelete: NoAction, onUpdate: NoAction, map: "fk_TicketCita_Medico1")
+
+  tickets TicketCita[]
+
+  @@index([Medico_idMedico], map: "fk_TicketCita_Medico1_idx")
+  @@index([Paciente_idPaciente], map: "fk_TicketCita_Paciente1_idx")
+  @@map("Cita")
+}
+
+model TicketCita {
+  idTicketCita Int      @id @default(autoincrement())
+  codigoTicket String   @db.VarChar(45)
+  Cita_idCita  Int
+  codigoPago   String?  @db.VarChar(45)
+  estado       String   @db.VarChar(20)
+  created_at   DateTime @default(now()) @db.Timestamp(0)
+
+  cita  Cita   @relation(fields: [Cita_idCita], references: [idCita], onDelete: NoAction, onUpdate: NoAction, map: "fk_TicketCita_Cita1")
+  pagos Pago[]
+
+  @@index([Cita_idCita], map: "fk_TicketCita_Cita1_idx")
+  @@map("TicketCita")
+}
+
+model ContactoEmergencia {
+  idContactoEmergencia Int       @id @default(autoincrement())
+  telefono             String    @db.VarChar(15)
+  correo               String    @db.VarChar(100)
+  nombres              String    @db.VarChar(40)
+  apellidos            String    @db.VarChar(45)
+  parentesco           String    @db.VarChar(45)
+  Paciente_idPaciente  Int?
+  paciente             Paciente? @relation(fields: [Paciente_idPaciente], references: [idPaciente], onDelete: NoAction, onUpdate: NoAction, map: "fk_ContactoEmergencia_Paciente1")
+
+  @@index([Paciente_idPaciente], map: "fk_ContactoEmergencia_Paciente1_idx")
+  @@map("ContactoEmergencia")
+}
+
+model Horario {
+  idHorario       Int    @id @default(autoincrement())
+  Medico_idMedico Int
+  medico          Medico @relation(fields: [Medico_idMedico], references: [idMedico], onDelete: NoAction, onUpdate: NoAction, map: "fk_Horario_Medico1")
+
+  detallesHorario DetallesHorario[]
+
+  @@index([Medico_idMedico], map: "fk_Horario_Medico1_idx")
+  @@map("Horario")
+}
+
+model Pago {
+  idPago                  Int        @id @default(autoincrement())
+  metodo                  String     @db.VarChar(45)
+  monto                   Float
+  fecha                   DateTime   @db.Date
+  hora                    DateTime   @db.Time(0)
+  estado                  String     @db.VarChar(45)
+  banco                   String?    @db.VarChar(45)
+  TicketCita_idTicketCita Int
+  ticketCita              TicketCita @relation(fields: [TicketCita_idTicketCita], references: [idTicketCita], onDelete: NoAction, onUpdate: NoAction, map: "fk_Pago_TicketCita1")
+
+  @@index([TicketCita_idTicketCita], map: "fk_Pago_TicketCita1_idx")
+  @@map("Pago")
+}
+
+model DetallesHorario {
+  idDetallesHorario Int      @id @default(autoincrement())
+  diaSemana         String   @db.VarChar(45)
+  turno             String   @db.VarChar(45)
+  horaInicio        DateTime @db.Time(0)
+  horaFin           DateTime @db.Time(0)
+  Horario_idHorario Int
+  horario           Horario  @relation(fields: [Horario_idHorario], references: [idHorario], onDelete: NoAction, onUpdate: NoAction, map: "fk_DetallesHorario_Horario1")
+
+  @@index([Horario_idHorario], map: "fk_DetallesHorario_Horario1_idx")
+  @@map("DetallesHorario")
+}
+
+model CodigoVerificacion {
+  idCodigoVerificacion Int      @id @default(autoincrement())
+  correo               String   @db.VarChar(100)
+  codigo               String   @db.VarChar(6)
+  fecha_expiracion     DateTime @db.Timestamp(0)
+  created_at           DateTime @default(now()) @db.Timestamp(0)
+
+  @@index([correo], map: "idx_codigo_verificacion_correo")
+  @@map("CodigoVerificacion")
+}
