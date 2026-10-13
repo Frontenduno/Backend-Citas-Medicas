@@ -4,6 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "tsx src/index.ts",
     "test": "jest --config jest.config.js --runInBand",
     "test:unit": "jest --config jest.config.js --testPathPattern=tests/unit",
     "test:integration": "tsx scripts/migrate-test-db.ts && jest --config jest.config.js --testPathPattern=tests/integration --runInBand",
@@ -19,6 +22,7 @@
   "devDependencies": {
     "@prisma/client": "^6.4.0",
     "@types/bcryptjs": "^2.4.6",
+    "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/jest": "^29.5.14",
