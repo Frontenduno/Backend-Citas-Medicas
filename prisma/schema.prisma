@@ -27,6 +27,7 @@ model Usuario {
 
   paciente Paciente?
   medico   Medico?
+  refreshTokens RefreshToken[]
 
   @@map("Usuario")
 }
@@ -162,3 +163,18 @@ model CodigoVerificacion {
   @@index([correo], map: "idx_codigo_verificacion_correo")
   @@map("CodigoVerificacion")
 }
+
+model RefreshToken {
+  idRefreshToken   Int      @id @default(autoincrement())
+  token            String   @unique(map: "token_UNIQUE") @db.VarChar(500)
+  idUsuario        Int
+  fecha_expiracion DateTime @db.Timestamp(0)
+  revocado         Boolean  @default(false)
+  created_at       DateTime @default(now()) @db.Timestamp(0)
+
+  usuario Usuario @relation(fields: [idUsuario], references: [idUsuario], onDelete: Cascade, onUpdate: NoAction, map: "fk_RefreshToken_Usuario")
+
+  @@index([idUsuario], map: "fk_RefreshToken_Usuario_idx")
+  @@map("RefreshToken")
+}
+

@@ -7,9 +7,11 @@ import { IniciarSesionUseCase } from '../../../application/usecase/auth/IniciarS
 import { ReenviarCodigoUseCase } from '../../../application/usecase/auth/ReenviarCodigoUseCase';
 import { SolicitarRecuperacionUseCase } from '../../../application/usecase/auth/SolicitarRecuperacionUseCase';
 import { RecuperarContrasenaUseCase } from '../../../application/usecase/auth/RecuperarContrasenaUseCase';
+import { RefrescarTokenUseCase } from '../../../application/usecase/auth/RefrescarTokenUseCase';
 
 import { PrismaUsuarioRepository } from '../../repository/PrismaUsuarioRepository';
 import { PrismaCodigoVerificacionRepository } from '../../repository/PrismaCodigoVerificacionRepository';
+import { PrismaRefreshTokenRepository } from '../../repository/PrismaRefreshTokenRepository';
 import { SharedContainer } from '../SharedContainer';
 
 export class AuthFactory {
@@ -17,6 +19,7 @@ export class AuthFactory {
     // 1. Repositorios de datos
     const usuarioRepository = new PrismaUsuarioRepository();
     const codigoRepository = new PrismaCodigoVerificacionRepository();
+    const refreshTokenRepository = new PrismaRefreshTokenRepository();
 
     // 2. Servicios de infraestructura compartidos
     const passwordHasher = SharedContainer.passwordHasher;
@@ -41,7 +44,14 @@ export class AuthFactory {
     const iniciarSesionUseCase = new IniciarSesionUseCase(
       usuarioRepository,
       jwtGenerator,
-      passwordHasher
+      passwordHasher,
+      refreshTokenRepository
+    );
+
+    const refrescarTokenUseCase = new RefrescarTokenUseCase(
+      refreshTokenRepository,
+      usuarioRepository,
+      jwtGenerator
     );
 
     const reenviarCodigoUseCase = new ReenviarCodigoUseCase(
@@ -71,7 +81,9 @@ export class AuthFactory {
       iniciarSesionUseCase,
       reenviarCodigoUseCase,
       solicitarRecuperacionUseCase,
-      recuperarContrasenaUseCase
+      recuperarContrasenaUseCase,
+      refrescarTokenUseCase,
+      refreshTokenRepository
     );
   }
 

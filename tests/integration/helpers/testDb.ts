@@ -11,6 +11,7 @@ export async function cleanDatabase(): Promise<void> {
   await prisma.contactoEmergencia.deleteMany({});
   await prisma.medico.deleteMany({});
   await prisma.paciente.deleteMany({});
+  await prisma.refreshToken.deleteMany({});
   await prisma.usuario.deleteMany({});
 }
 

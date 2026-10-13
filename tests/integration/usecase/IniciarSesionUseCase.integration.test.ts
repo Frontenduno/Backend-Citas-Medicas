@@ -1,5 +1,6 @@
 import { IniciarSesionUseCase } from '../../../src/application/usecase/auth/IniciarSesionUseCase';
 import { PrismaUsuarioRepository } from '../../../src/infrastructure/repository/PrismaUsuarioRepository';
+import { PrismaRefreshTokenRepository } from '../../../src/infrastructure/repository/PrismaRefreshTokenRepository';
 import { BcryptPasswordHasher } from '../../../src/infrastructure/service/BcryptPasswordHasher';
 import { JsonWebTokenGenerator } from '../../../src/infrastructure/service/JsonWebTokenGenerator';
 import { Usuario } from '../../../src/domain/entity/Usuario';
@@ -11,9 +12,15 @@ import { cleanDatabase, disconnectDatabase } from '../helpers/testDb';
 
 describe('IniciarSesionUseCase Integration Tests', () => {
   const usuarioRepository = new PrismaUsuarioRepository();
+  const refreshTokenRepository = new PrismaRefreshTokenRepository();
   const passwordHasher = new BcryptPasswordHasher();
-  const jwtGenerator = new JsonWebTokenGenerator('integration-test-secret', '1h');
-  const useCase = new IniciarSesionUseCase(usuarioRepository, jwtGenerator, passwordHasher);
+  const jwtGenerator = new JsonWebTokenGenerator('integration-test-secret', '15m');
+  const useCase = new IniciarSesionUseCase(
+    usuarioRepository,
+    jwtGenerator,
+    passwordHasher,
+    refreshTokenRepository
+  );
 
   beforeAll(async () => {
     await cleanDatabase();
@@ -50,20 +57,26 @@ describe('IniciarSesionUseCase Integration Tests', () => {
     return await usuarioRepository.save(usuario);
   };
 
-  it('debe iniciar sesión exitosamente y retornar un JWT válido para un usuario verificado', async () => {
+  it('debe iniciar sesión exitosamente, retornar access y refresh tokens y persistir el refresh token en la BD', async () => {
     const correo = 'login_success@test.com';
     const contrasena = 'MiPasswordValido123';
     const user = await seedUsuario(correo, contrasena, true);
 
-    const token = await useCase.ejecutar({ correo, contrasena });
+    const tokens = await useCase.ejecutar({ correo, contrasena });
 
-    expect(typeof token).toBe('string');
-    expect(token.length).toBeGreaterThan(20);
+    expect(tokens.accessToken).toBeDefined();
+    expect(tokens.refreshToken).toBeDefined();
 
-    const decoded = await jwtGenerator.decodificarToken(token as string);
-    expect(decoded.correo).toBe(correo);
-    expect(decoded.idUsuario).toBe(user.idUsuario.toString());
-    expect(decoded.rol).toBe(Rol.PACIENTE);
+    // Validar token de acceso
+    const decodedAccess = await jwtGenerator.decodificarToken(tokens.accessToken);
+    expect(decodedAccess.correo).toBe(correo);
+    expect(decodedAccess.idUsuario).toBe(user.idUsuario.toString());
+
+    // Validar persistencia en base de datos
+    const tokenDb = await refreshTokenRepository.findByToken(tokens.refreshToken);
+    expect(tokenDb).not.toBeNull();
+    expect(tokenDb?.idUsuario).toBe(user.idUsuario);
+    expect(tokenDb?.revocado).toBe(false);
   });
 
   it('debe lanzar CredencialesIncorrectasException si la contraseña es incorrecta', async () => {

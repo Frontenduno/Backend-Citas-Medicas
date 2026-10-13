@@ -5,6 +5,7 @@ import {
   crearMockUsuarioRepository,
   crearMockJwtGenerator,
   crearMockPasswordHasher,
+  crearMockRefreshTokenRepository,
 } from "../../../helpers/mocks";
 import {
   crearUsuarioVerificado,
@@ -18,7 +19,8 @@ const DTO_VALIDO = {
   contrasena: "Password123!",
 };
 
-const TOKEN_ESPERADO = "jwt.token.firmado";
+const ACCESS_TOKEN_ESPERADO = "jwt.access.token";
+const REFRESH_TOKEN_ESPERADO = "jwt.refresh.token";
 
 // ─── Suite ────────────────────────────────────────────────────────────────────
 
@@ -26,82 +28,94 @@ describe("IniciarSesionUseCase", () => {
   let usuarioRepo: ReturnType<typeof crearMockUsuarioRepository>;
   let jwtGenerator: ReturnType<typeof crearMockJwtGenerator>;
   let passwordHasher: ReturnType<typeof crearMockPasswordHasher>;
+  let refreshTokenRepo: ReturnType<typeof crearMockRefreshTokenRepository>;
   let useCase: IniciarSesionUseCase;
 
   beforeEach(() => {
     usuarioRepo = crearMockUsuarioRepository();
     jwtGenerator = crearMockJwtGenerator();
     passwordHasher = crearMockPasswordHasher();
-    useCase = new IniciarSesionUseCase(usuarioRepo, jwtGenerator, passwordHasher);
+    refreshTokenRepo = crearMockRefreshTokenRepository();
+    useCase = new IniciarSesionUseCase(
+      usuarioRepo,
+      jwtGenerator,
+      passwordHasher,
+      refreshTokenRepo
+    );
   });
 
   // ─── Casos de éxito ─────────────────────────────────────────────────────────
 
   describe("ejecutar (éxito)", () => {
-    it("debe retornar un token JWT cuando las credenciales son válidas", async () => {
+    it("debe retornar los tokens de acceso y refresh y persistir el refresh token cuando las credenciales son válidas", async () => {
       // Arrange
       const usuario = crearUsuarioVerificado({ correo: DTO_VALIDO.correo });
       usuarioRepo.findByCorreo.mockResolvedValue(usuario);
       passwordHasher.compararContrasena.mockResolvedValue(true);
-      jwtGenerator.generarToken.mockResolvedValue(TOKEN_ESPERADO);
+      jwtGenerator.generarAccessToken.mockResolvedValue(ACCESS_TOKEN_ESPERADO);
+      jwtGenerator.generarRefreshToken.mockResolvedValue(REFRESH_TOKEN_ESPERADO);
+      refreshTokenRepo.save.mockResolvedValue({} as any);
 
       // Act
       const resultado = await useCase.ejecutar(DTO_VALIDO);
 
       // Assert
-      expect(resultado).toBe(TOKEN_ESPERADO);
+      expect(resultado).toEqual({
+        accessToken: ACCESS_TOKEN_ESPERADO,
+        refreshToken: REFRESH_TOKEN_ESPERADO,
+      });
       expect(usuarioRepo.findByCorreo).toHaveBeenCalledWith(DTO_VALIDO.correo);
       expect(passwordHasher.compararContrasena).toHaveBeenCalledWith(
         DTO_VALIDO.contrasena,
         usuario.contrasena
       );
-      expect(jwtGenerator.generarToken).toHaveBeenCalledWith({
+      expect(jwtGenerator.generarAccessToken).toHaveBeenCalledWith({
         correo: usuario.correo,
         idUsuario: usuario.idUsuario.toString(),
         rol: usuario.rol,
       });
+      expect(jwtGenerator.generarRefreshToken).toHaveBeenCalledWith({
+        correo: usuario.correo,
+        idUsuario: usuario.idUsuario.toString(),
+        rol: usuario.rol,
+      });
+      expect(refreshTokenRepo.save).toHaveBeenCalled();
     });
   });
 
-  // ─── Casos de excepción ──────────────────────────────────────────────────────
+  // ─── Casos de excepción ─────────────────────────────────────────────────────
 
   describe("ejecutar (excepciones)", () => {
     it("debe lanzar CredencialesIncorrectasException si el usuario no existe", async () => {
-      // Arrange
       usuarioRepo.findByCorreo.mockResolvedValue(null);
 
-      // Act & Assert
       await expect(useCase.ejecutar(DTO_VALIDO)).rejects.toThrow(
         CredencialesIncorrectasException
       );
       expect(passwordHasher.compararContrasena).not.toHaveBeenCalled();
-      expect(jwtGenerator.generarToken).not.toHaveBeenCalled();
+      expect(jwtGenerator.generarAccessToken).not.toHaveBeenCalled();
     });
 
-    it("debe lanzar CredencialesIncorrectasException si la contraseña es incorrecta", async () => {
-      // Arrange
-      const usuario = crearUsuarioVerificado({ correo: DTO_VALIDO.correo });
+    it("debe lanzar CredencialesIncorrectasException si la contraseña no coincide", async () => {
+      const usuario = crearUsuarioVerificado();
       usuarioRepo.findByCorreo.mockResolvedValue(usuario);
       passwordHasher.compararContrasena.mockResolvedValue(false);
 
-      // Act & Assert
       await expect(useCase.ejecutar(DTO_VALIDO)).rejects.toThrow(
         CredencialesIncorrectasException
       );
-      expect(jwtGenerator.generarToken).not.toHaveBeenCalled();
+      expect(jwtGenerator.generarAccessToken).not.toHaveBeenCalled();
     });
 
-    it("debe lanzar CorreoNoVerificadoException si el usuario no ha verificado su correo", async () => {
-      // Arrange
-      const usuario = crearUsuarioNoVerificado({ correo: DTO_VALIDO.correo });
+    it("debe lanzar CorreoNoVerificadoException si el usuario no ha verificado su cuenta", async () => {
+      const usuario = crearUsuarioNoVerificado();
       usuarioRepo.findByCorreo.mockResolvedValue(usuario);
       passwordHasher.compararContrasena.mockResolvedValue(true);
 
-      // Act & Assert
       await expect(useCase.ejecutar(DTO_VALIDO)).rejects.toThrow(
         CorreoNoVerificadoException
       );
-      expect(jwtGenerator.generarToken).not.toHaveBeenCalled();
+      expect(jwtGenerator.generarAccessToken).not.toHaveBeenCalled();
     });
   });
 });

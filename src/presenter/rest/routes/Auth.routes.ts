@@ -7,6 +7,7 @@ export function createAuthRouter(authController: AuthController): Router {
   router.post('/registro', authController.registrarse);
   router.post('/verificar-codigo', authController.verificarCodigo);
   router.post('/login', authController.iniciarSesion);
+  router.post('/refresh', authController.refrescarToken);
   router.post('/reenviar-codigo', authController.reenviarCodigo);
   router.post('/solicitar-recuperacion', authController.solicitarRecuperacion);
   router.post('/recuperar-contrasena', authController.recuperarContrasena);
