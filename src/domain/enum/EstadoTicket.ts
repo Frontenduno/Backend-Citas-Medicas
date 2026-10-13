@@ -1,0 +1,7 @@
+export enum EstadoTicket {
+    PENDIENTE = 'PENDIENTE',
+    PAGADO = 'PAGADO',
+    CANCELADO = 'CANCELADO',
+    COMPLETADO = 'COMPLETADO',
+    NO_ASISTIO = 'NO_ASISTIO'
+}
