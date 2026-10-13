@@ -27,7 +27,7 @@ export class IniciarSesionUseCase {
             throw new CredencialesIncorrectasException();
         }
 
-        const esValido = this.hashGenerator.compararContrasena(credenciales.contrasena, usuario.contrasena);
+        const esValido = await this.hashGenerator.compararContrasena(credenciales.contrasena, usuario.contrasena);
         if (!esValido) {
             throw new CredencialesIncorrectasException();
         }
