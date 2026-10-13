@@ -5,6 +5,8 @@ import { IniciarSesionUseCase } from '../../../application/usecase/auth/IniciarS
 import { ReenviarCodigoUseCase } from '../../../application/usecase/auth/ReenviarCodigoUseCase';
 import { SolicitarRecuperacionUseCase } from '../../../application/usecase/auth/SolicitarRecuperacionUseCase';
 import { RecuperarContrasenaUseCase } from '../../../application/usecase/auth/RecuperarContrasenaUseCase';
+import { RefrescarTokenUseCase } from '../../../application/usecase/auth/RefrescarTokenUseCase';
+import { RefreshTokenRepository } from '../../../domain/repository/RefreshTokenRepository';
 import { RegistrarseDTO } from '../../../application/dto/AuthDTO';
 
 import { BaseException } from '../../../application/exception/BaseException';
@@ -15,6 +17,7 @@ import { UsuarioYaExisteException } from '../../../application/exception/Usuario
 import { UsuarioYaVerificadoException } from '../../../application/exception/UsuarioYaVerificadoException';
 import { CodigoInvalidoException } from '../../../application/exception/CodigoInvalidoException';
 import { CodigoExpiradoException } from '../../../application/exception/CodigoExpiradoException';
+import { TokenInvalidoException } from '../../../application/exception/TokenInvalidoException';
 
 export class AuthController {
   constructor(
@@ -23,7 +26,9 @@ export class AuthController {
     private readonly iniciarSesionUseCase: IniciarSesionUseCase,
     private readonly reenviarCodigoUseCase: ReenviarCodigoUseCase,
     private readonly solicitarRecuperacionUseCase: SolicitarRecuperacionUseCase,
-    private readonly recuperarContrasenaUseCase: RecuperarContrasenaUseCase
+    private readonly recuperarContrasenaUseCase: RecuperarContrasenaUseCase,
+    private readonly refrescarTokenUseCase?: RefrescarTokenUseCase,
+    private readonly refreshTokenRepository?: RefreshTokenRepository
   ) {}
 
   registrarse = async (req: Request, res: Response): Promise<Response> => {
@@ -92,19 +97,71 @@ export class AuthController {
         return res.status(400).json({ message: 'El correo y la contraseña son requeridos' });
       }
 
-      const token = await this.iniciarSesionUseCase.ejecutar({ correo, contrasena });
+      const tokens = await this.iniciarSesionUseCase.ejecutar({ correo, contrasena });
 
-      // Enviar el access_token como cookie HttpOnly
-      res.cookie('access_token', token as string, {
+      // 1. Enviar el access_token como cookie HttpOnly (15 minutos)
+      res.cookie('access_token', tokens.accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        maxAge: 24 * 60 * 60 * 1000, // 24 horas
+        maxAge: 15 * 60 * 1000,
+      });
+
+      // 2. Enviar el refresh_token como cookie HttpOnly (7 días, ruta acotada a auth)
+      res.cookie('refresh_token', tokens.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        path: '/api/v1/auth',
       });
 
       return res.status(200).json({
         message: 'Inicio de sesión exitoso',
-        token,
+        accessToken: tokens.accessToken,
+      });
+    } catch (error) {
+      return this.handleError(error, res);
+    }
+  };
+
+  refrescarToken = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const refreshToken = req.cookies?.refresh_token;
+
+      if (!refreshToken) {
+        return res.status(401).json({
+          message: 'No se encontró el token de actualización (refresh_token)',
+          code: 'NO_REFRESH_TOKEN',
+        });
+      }
+
+      if (!this.refrescarTokenUseCase) {
+        return res.status(500).json({ message: 'Servicio de refresco no disponible' });
+      }
+
+      const tokens = await this.refrescarTokenUseCase.ejecutar(refreshToken);
+
+      // Renovar cookie de access_token
+      res.cookie('access_token', tokens.accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        maxAge: 15 * 60 * 1000,
+      });
+
+      // Renovar cookie de refresh_token (Token Rotation)
+      res.cookie('refresh_token', tokens.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        path: '/api/v1/auth',
+      });
+
+      return res.status(200).json({
+        message: 'Token renovado exitosamente',
+        accessToken: tokens.accessToken,
       });
     } catch (error) {
       return this.handleError(error, res);
@@ -171,11 +228,27 @@ export class AuthController {
     }
   };
 
-  cerrarSesion = async (_req: Request, res: Response): Promise<Response> => {
+  cerrarSesion = async (req: Request, res: Response): Promise<Response> => {
+    const refreshToken = req.cookies?.refresh_token;
+    if (refreshToken && this.refreshTokenRepository) {
+      try {
+        await this.refreshTokenRepository.revokeByToken(refreshToken);
+      } catch (err) {
+        console.error('Error al revocar refresh token:', err);
+      }
+    }
+
     res.clearCookie('access_token', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    });
+
+    res.clearCookie('refresh_token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      path: '/api/v1/auth',
     });
 
     return res.status(200).json({
@@ -186,6 +259,9 @@ export class AuthController {
   private handleError(error: unknown, res: Response): Response {
     if (error instanceof CredencialesIncorrectasException) {
       return res.status(401).json({ message: error.message });
+    }
+    if (error instanceof TokenInvalidoException) {
+      return res.status(401).json({ message: error.message, code: 'INVALID_REFRESH_TOKEN' });
     }
     if (error instanceof CorreoNoVerificadoException) {
       return res.status(403).json({ message: error.message });

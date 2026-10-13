@@ -1,5 +1,6 @@
 import { UsuarioRepository } from "../../../src/domain/repository/UsuarioRepository";
 import { CodigoVerificacionRepository } from "../../../src/domain/repository/CodigoVerificacionRepository";
+import { RefreshTokenRepository } from "../../../src/domain/repository/RefreshTokenRepository";
 import { PasswordHasher } from "../../../src/application/port/PasswordHasher";
 import { JwtGenerator } from "../../../src/application/port/JwtGenerator";
 import { EmailSender } from "../../../src/application/port/EmailSender";
@@ -25,6 +26,17 @@ export const crearMockCodigoVerificacionRepository =
     deleteByCorreo: jest.fn(),
   });
 
+// ─── Mock RefreshTokenRepository ──────────────────────────────────────────────
+
+export const crearMockRefreshTokenRepository =
+  (): jest.Mocked<RefreshTokenRepository> => ({
+    save: jest.fn(),
+    findByToken: jest.fn(),
+    revokeByToken: jest.fn(),
+    revokeAllByUsuario: jest.fn(),
+    deleteByToken: jest.fn(),
+  });
+
 // ─── Mock PasswordHasher ──────────────────────────────────────────────────────
 
 export const crearMockPasswordHasher = (): jest.Mocked<PasswordHasher> => ({
@@ -36,7 +48,10 @@ export const crearMockPasswordHasher = (): jest.Mocked<PasswordHasher> => ({
 
 export const crearMockJwtGenerator = (): jest.Mocked<JwtGenerator> => ({
   generarToken: jest.fn(),
+  generarAccessToken: jest.fn(),
+  generarRefreshToken: jest.fn(),
   decodificarToken: jest.fn(),
+  decodificarRefreshToken: jest.fn(),
 });
 
 // ─── Mock EmailSender ─────────────────────────────────────────────────────────
