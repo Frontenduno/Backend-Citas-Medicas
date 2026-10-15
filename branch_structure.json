@@ -1,0 +1,30 @@
+{
+  "default_branch": "main",
+  "branches": [
+    "alessandro/dev",
+    "gustavo/dev",
+    "josue/dev",
+    "main",
+    "malaver/dev",
+    "origin",
+    "test_integration"
+  ],
+  "parent": {
+    "alessandro/dev": "main",
+    "gustavo/dev": "main",
+    "josue/dev": "main",
+    "main": null,
+    "malaver/dev": "main",
+    "origin": "main",
+    "test_integration": "main"
+  },
+  "order": [
+    "main",
+    "alessandro/dev",
+    "gustavo/dev",
+    "josue/dev",
+    "malaver/dev",
+    "origin",
+    "test_integration"
+  ]
+}
