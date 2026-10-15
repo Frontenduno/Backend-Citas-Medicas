@@ -15,6 +15,7 @@ export const crearMockUsuarioRepository = (): jest.Mocked<UsuarioRepository> => 
   findById: jest.fn(),
   findByCorreo: jest.fn(),
   findAll: jest.fn(),
+  findByDocumento: jest.fn(),
 });
 
 // ─── Mock CodigoVerificacionRepository ───────────────────────────────────────
