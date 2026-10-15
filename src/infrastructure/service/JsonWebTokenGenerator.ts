@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import { JwtGenerator, Payload } from '../../application/port/JwtGenerator';
 
 export class JsonWebTokenGenerator implements JwtGenerator {
@@ -42,7 +43,7 @@ export class JsonWebTokenGenerator implements JwtGenerator {
   private signToken(payload: Payload, secret: string, expiresIn: string): Promise<string> {
     return new Promise<string>((resolve, reject) => {
       jwt.sign(
-        { ...payload },
+        { ...payload, jti: crypto.randomUUID() },
         secret,
         { expiresIn: expiresIn as any },
         (err, token) => {

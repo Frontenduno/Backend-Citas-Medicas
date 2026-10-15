@@ -9,7 +9,7 @@ export class RefrescarTokenUseCase {
     private readonly refreshTokenRepository: RefreshTokenRepository,
     private readonly usuarioRepository: UsuarioRepository,
     private readonly jwtGenerator: JwtGenerator
-  ) {}
+  ) { }
 
   async ejecutar(refreshToken: string): Promise<AuthTokens> {
     if (!refreshToken) {

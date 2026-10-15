@@ -7,4 +7,5 @@ export interface UsuarioRepository {
   findById(id: number): Promise<Usuario | null>;
   findByCorreo(correo: string): Promise<Usuario | null>;
   findAll(): Promise<Usuario[]>;
+  findByDocumento(documento: string): Promise<Usuario | null>;
 }

@@ -57,7 +57,6 @@ describe('RefrescarTokenUseCase Integration Tests', () => {
       rol: usuario.rol,
     };
     const oldRefreshToken = await jwtGenerator.generarRefreshToken(payload);
-
     await refreshTokenRepository.save(
       new RefreshToken(
         0,
