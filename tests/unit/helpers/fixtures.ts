@@ -1,7 +1,9 @@
 import { Usuario } from "../../../src/domain/entity/Usuario";
 import { CodigoVerificacion } from "../../../src/domain/entity/CodigoVerificacion";
+import { Paciente } from "../../../src/domain/entity/Paciente";
 import { Genero } from "../../../src/domain/enum/Genero";
 import { Rol } from "../../../src/domain/enum/Rol";
+import { DetalleCitaPacienteDTO } from "../../../src/application/dto/CitaPacienteDTO";
 
 // ─── Fixtures de Usuario ──────────────────────────────────────────────────────
 
@@ -54,3 +56,24 @@ export const crearCodigoExpirado = (overrides: Partial<CodigoVerificacion> = {})
     overrides.codigo ?? "ABC123",
     overrides.fecha_expiracion ?? new Date(Date.now() - 5 * 60 * 1000) // expiró hace 5 min
   );
+
+// ─── Fixtures de Paciente ─────────────────────────────────────────────────────
+
+export const crearPaciente = (overrides: Partial<Paciente> = {}): Paciente =>
+  new Paciente(
+    overrides.idPaciente ?? 1,
+    overrides.Usuario_idUsuario ?? 1
+  );
+
+// ─── Fixtures de DetalleCitaPacienteDTO ───────────────────────────────────────
+
+export const crearDetalleCitaPaciente = (
+  overrides: Partial<DetalleCitaPacienteDTO> = {}
+): DetalleCitaPacienteDTO => ({
+  idCita: overrides.idCita ?? 1,
+  codigoTicket: overrides.codigoTicket ?? "TK-20261020-001",
+  nombreMedico: overrides.nombreMedico ?? "Juan Pérez",
+  especialidad: overrides.especialidad ?? "Cardiología",
+  fecha: overrides.fecha ?? new Date("2026-10-20T00:00:00.000Z"),
+  hora: overrides.hora ?? new Date("1970-01-01T14:30:00.000Z"),
+});

@@ -2,9 +2,14 @@ import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { AuthFactory } from './infrastructure/di/factories/AuthFactory';
+import { PacienteFactory } from './infrastructure/di/factories/PacienteFactory';
+import { createAuthMiddleware } from './presenter/rest/middleware/AuthMiddleware';
+import { SharedContainer } from './infrastructure/di/SharedContainer';
 
 const app: Application = express();
 const authRouter = AuthFactory.createRouter();
+const pacienteRouter = PacienteFactory.createRouter();
+const authMiddleware = createAuthMiddleware(SharedContainer.jwtGenerator);
 
 // Configuración de Middlewares globales
 app.use(
@@ -29,6 +34,7 @@ app.get('/health', (_req: Request, res: Response) => {
 // Rutas de la API
 app.use('/api/v1/auth', authRouter);
 app.use('/api/auth', authRouter); // Alias de compatibilidad
+app.use('/api/v1/paciente', authMiddleware, pacienteRouter);
 
 // Manejador para rutas no encontradas (404)
 app.use((req: Request, res: Response) => {

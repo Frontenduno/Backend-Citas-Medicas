@@ -1,10 +1,12 @@
 import { UsuarioRepository } from "../../../src/domain/repository/UsuarioRepository";
 import { CodigoVerificacionRepository } from "../../../src/domain/repository/CodigoVerificacionRepository";
 import { RefreshTokenRepository } from "../../../src/domain/repository/RefreshTokenRepository";
+import { PacienteRepository } from "../../../src/domain/repository/PacienteRepository";
 import { PasswordHasher } from "../../../src/application/port/PasswordHasher";
 import { JwtGenerator } from "../../../src/application/port/JwtGenerator";
 import { EmailSender } from "../../../src/application/port/EmailSender";
 import { CodeGenerator } from "../../../src/application/port/CodeGenerator";
+import { CitaPacienteQueryPort } from "../../../src/application/port/CitaPacienteQueryPort";
 
 // ─── Mock UsuarioRepository ───────────────────────────────────────────────────
 
@@ -66,3 +68,19 @@ export const crearMockEmailSender = (): jest.Mocked<EmailSender> => ({
 export const crearMockCodeGenerator = (): jest.Mocked<CodeGenerator> => ({
   generateCode: jest.fn(),
 });
+
+// ─── Mock PacienteRepository ──────────────────────────────────────────────────
+
+export const crearMockPacienteRepository = (): jest.Mocked<PacienteRepository> => ({
+  save: jest.fn(),
+  findById: jest.fn(),
+  findByUsuarioId: jest.fn(),
+  findAll: jest.fn(),
+});
+
+// ─── Mock CitaPacienteQueryPort ───────────────────────────────────────────────
+
+export const crearMockCitaPacienteQueryPort =
+  (): jest.Mocked<CitaPacienteQueryPort> => ({
+    listarCitasPaciente: jest.fn(),
+  });
