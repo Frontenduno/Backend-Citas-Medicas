@@ -10,6 +10,7 @@ import { RecuperarContrasenaUseCase } from '../../../application/usecase/auth/Re
 import { RefrescarTokenUseCase } from '../../../application/usecase/auth/RefrescarTokenUseCase';
 
 import { PrismaUsuarioRepository } from '../../repository/PrismaUsuarioRepository';
+import { PrismaPacienteRepository } from '../../repository/PrismaPacienteRepository';
 import { PrismaCodigoVerificacionRepository } from '../../repository/PrismaCodigoVerificacionRepository';
 import { PrismaRefreshTokenRepository } from '../../repository/PrismaRefreshTokenRepository';
 import { SharedContainer } from '../SharedContainer';
@@ -18,6 +19,7 @@ export class AuthFactory {
   static createController(): AuthController {
     // 1. Repositorios de datos
     const usuarioRepository = new PrismaUsuarioRepository();
+    const pacienteRepository = new PrismaPacienteRepository();
     const codigoRepository = new PrismaCodigoVerificacionRepository();
     const refreshTokenRepository = new PrismaRefreshTokenRepository();
 
@@ -33,7 +35,8 @@ export class AuthFactory {
       codigoRepository,
       passwordHasher,
       emailSender,
-      codeGenerator
+      codeGenerator,
+      pacienteRepository
     );
 
     const verificarCodigoUseCase = new VerificarCodigoUseCase(

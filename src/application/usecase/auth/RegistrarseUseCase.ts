@@ -1,6 +1,9 @@
 import { CodigoVerificacion } from "../../../domain/entity/CodigoVerificacion";
+import { Paciente } from "../../../domain/entity/Paciente";
 import { Usuario } from "../../../domain/entity/Usuario";
+import { Rol } from "../../../domain/enum/Rol";
 import { CodigoVerificacionRepository } from "../../../domain/repository/CodigoVerificacionRepository";
+import { PacienteRepository } from "../../../domain/repository/PacienteRepository";
 import { UsuarioRepository } from "../../../domain/repository/UsuarioRepository";
 import { RegistrarseDTO } from "../../dto/AuthDTO";
 import { UsuarioYaExisteException } from "../../exception/UsuarioYaExisteException";
@@ -14,19 +17,22 @@ export class RegistrarseUseCase {
     private readonly passwordHasher: PasswordHasher;
     private readonly emailSender: EmailSender;
     private readonly codeGenerator: CodeGenerator;
+    private readonly pacienteRepository?: PacienteRepository;
 
     constructor(
         usuarioRepository: UsuarioRepository,
         codigoVerificacionRepository: CodigoVerificacionRepository,
         passwordHasher: PasswordHasher,
         emailSender: EmailSender,
-        codeGenerator: CodeGenerator
+        codeGenerator: CodeGenerator,
+        pacienteRepository?: PacienteRepository
     ) {
         this.usuarioRepository = usuarioRepository;
         this.codigoVerificacionRepository = codigoVerificacionRepository;
         this.passwordHasher = passwordHasher;
         this.emailSender = emailSender;
         this.codeGenerator = codeGenerator;
+        this.pacienteRepository = pacienteRepository;
     }
 
     async ejecutar(data: RegistrarseDTO): Promise<void> {
@@ -51,7 +57,14 @@ export class RegistrarseUseCase {
             false
         );
 
-        await this.usuarioRepository.save(nuevoUsuario);
+        const usuarioCreado = await this.usuarioRepository.save(nuevoUsuario);
+
+        // Todo usuario con rol PACIENTE necesita su perfil para poder consultar sus citas.
+        if (data.rol === Rol.PACIENTE && this.pacienteRepository) {
+            await this.pacienteRepository.save(
+                new Paciente(0, usuarioCreado.idUsuario)
+            );
+        }
 
         await this.codigoVerificacionRepository.deleteByCorreo(data.correo);
 

@@ -1,0 +1,227 @@
+{
+  "info": {
+    "_postman_id": "c1a7d9e4-6f5b-4f7e-9a2c-citasmedicas001",
+    "name": "Backend Citas Médicas",
+    "description": "Colección para probar los endpoints locales del backend. Flujo recomendado: Registro -> leer código en consola -> Verificar -> Login -> Citas del paciente.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('200 OK', () => pm.response.to.have.status(200));"],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Registro",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombres\": \"Test\",\n  \"apellidos\": \"Postman\",\n  \"correo\": \"{{correo}}\",\n  \"contrasena\": \"{{contrasena}}\",\n  \"documento_identidad\": \"{{documento}}\",\n  \"telefono\": \"999111222\",\n  \"genero\": \"Otro\",\n  \"fecha_nacimiento\": \"1995-01-01\",\n  \"rol\": \"PACIENTE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/registro",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "registro"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "console.log('Revisa la consola del servidor para obtener el código [DEV][EMAIL]');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Verificar código",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"{{correo}}\",\n  \"codigo\": \"{{codigo}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/verificar-codigo",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "verificar-codigo"]
+            }
+          }
+        },
+        {
+          "name": "Reenviar código",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"{{correo}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/reenviar-codigo",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "reenviar-codigo"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"{{correo}}\",\n  \"contrasena\": \"{{contrasena}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const data = pm.response.json();",
+                  "if (data.accessToken) { pm.environment.set('accessToken', data.accessToken); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh token",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/refresh",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "refresh"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "logout"]
+            }
+          }
+        },
+        {
+          "name": "Solicitar recuperación",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"{{correo}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/solicitar-recuperacion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "solicitar-recuperacion"]
+            }
+          }
+        },
+        {
+          "name": "Recuperar contraseña",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"{{correo}}\",\n  \"codigo\": \"{{codigo}}\",\n  \"nuevaContrasena\": \"NuevaClave123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/recuperar-contrasena",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "recuperar-contrasena"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Paciente",
+      "item": [
+        {
+          "name": "GET /api/v1/paciente/citas",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/paciente/citas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "paciente", "citas"],
+              "query": [
+                { "key": "medicoId", "value": "1", "disabled": true },
+                { "key": "especialidadId", "value": "1", "disabled": true },
+                { "key": "fecha", "value": "2026-10-21", "disabled": true }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('200 OK', () => pm.response.to.have.status(200));"],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

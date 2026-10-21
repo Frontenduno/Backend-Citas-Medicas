@@ -7,6 +7,13 @@ import { EstadoTicket } from '../../../src/domain/enum/EstadoTicket';
 
 describe('PrismaCitaPacienteQuery Integration Tests', () => {
   const query = new PrismaCitaPacienteQuery();
+  let secuenciaDocumento = 0;
+
+  // documento_identidad es VARCHAR(20): se generan valores numéricos cortos y únicos.
+  const generarDocumento = (): string => {
+    secuenciaDocumento += 1;
+    return String(20000000 + secuenciaDocumento);
+  };
 
   beforeAll(async () => {
     await cleanDatabase();
@@ -14,6 +21,7 @@ describe('PrismaCitaPacienteQuery Integration Tests', () => {
 
   beforeEach(async () => {
     await cleanDatabase();
+    secuenciaDocumento = 0;
   });
 
   afterAll(async () => {
@@ -31,7 +39,7 @@ describe('PrismaCitaPacienteQuery Integration Tests', () => {
         apellidos: `Apellido${suffix}`,
         correo: `${suffix}@example.com`,
         telefono: '999888777',
-        documento_identidad: `DOC${suffix}`,
+        documento_identidad: generarDocumento(),
         fecha_nacimiento: new Date('1990-01-01T00:00:00.000Z'),
         genero: Genero.MASCULINO,
         rol,

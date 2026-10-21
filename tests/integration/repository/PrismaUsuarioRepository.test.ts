@@ -6,6 +6,14 @@ import { cleanDatabase, disconnectDatabase } from '../helpers/testDb';
 
 describe('PrismaUsuarioRepository Integration Tests', () => {
   const repository = new PrismaUsuarioRepository();
+  let secuenciaDocumento = 0;
+
+  // documento_identidad es VARCHAR(20) y telefono VARCHAR(15):
+  // se generan valores numéricos cortos y únicos para cada usuario.
+  const generarDocumento = (): string => {
+    secuenciaDocumento += 1;
+    return String(10000000 + secuenciaDocumento);
+  };
 
   beforeAll(async () => {
     await cleanDatabase();
@@ -13,6 +21,7 @@ describe('PrismaUsuarioRepository Integration Tests', () => {
 
   beforeEach(async () => {
     await cleanDatabase();
+    secuenciaDocumento = 0;
   });
 
   afterAll(async () => {
@@ -27,8 +36,8 @@ describe('PrismaUsuarioRepository Integration Tests', () => {
       `Juan${suffix}`,
       `Perez${suffix}`,
       `juan${suffix}@example.com`,
-      `1234567${suffix}`,
-      `98765432${suffix}`,
+      generarDocumento(),
+      '987654321',
       Genero.MASCULINO,
       new Date('1990-01-01'),
       Rol.PACIENTE,
@@ -74,11 +83,11 @@ describe('PrismaUsuarioRepository Integration Tests', () => {
   });
 
   it('debe encontrar un usuario por documento de identidad (findByDocumento)', async () => {
-    await repository.save(buildUsuario('findbydoc'));
-    const encontrado = await repository.findByDocumento('1234567findbydoc');
+    const guardado = await repository.save(buildUsuario('findbydoc'));
+    const encontrado = await repository.findByDocumento(guardado.documento_identidad);
 
     expect(encontrado).not.toBeNull();
-    expect(encontrado?.documento_identidad).toBe('1234567findbydoc');
+    expect(encontrado?.documento_identidad).toBe(guardado.documento_identidad);
   });
 
   it('debe actualizar los datos de un usuario existente (update)', async () => {
