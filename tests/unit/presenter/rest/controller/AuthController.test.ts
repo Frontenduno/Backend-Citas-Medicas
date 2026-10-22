@@ -14,6 +14,7 @@ import { Genero } from '../../../../../src/domain/enum/Genero';
 import { CredencialesIncorrectasException } from '../../../../../src/application/exception/CredencialesIncorrectasException';
 import { CorreoNoVerificadoException } from '../../../../../src/application/exception/CorreoNoVerificadoException';
 import { UsuarioYaExisteException } from '../../../../../src/application/exception/UsuarioYaExisteException';
+import { EmailNoEnviadoException } from '../../../../../src/application/exception/EmailNoEnviadoException';
 import { CodigoInvalidoException } from '../../../../../src/application/exception/CodigoInvalidoException';
 import { UsuarioNoEncontradoException } from '../../../../../src/application/exception/UsuarioNoEncontradoException';
 import { TokenInvalidoException } from '../../../../../src/application/exception/TokenInvalidoException';
@@ -125,6 +126,24 @@ describe('AuthController Unit Tests', () => {
       await controller.registrarse(mockReq as Request, mockRes as Response);
 
       expect(mockRes.status).toHaveBeenCalledWith(409);
+    });
+
+    it('debe retornar 502 si no se pudo enviar el correo de verificación', async () => {
+      mockReq = {
+        body: {
+          nombres: 'Ana',
+          apellidos: 'Torres',
+          correo: 'ana@test.com',
+          contrasena: 'Pass123!',
+          rol: Rol.PACIENTE,
+        },
+      };
+
+      registrarseUseCase.ejecutar.mockRejectedValue(new EmailNoEnviadoException());
+
+      await controller.registrarse(mockReq as Request, mockRes as Response);
+
+      expect(mockRes.status).toHaveBeenCalledWith(502);
     });
   });
 
@@ -286,6 +305,15 @@ describe('AuthController Unit Tests', () => {
       await controller.reenviarCodigo(mockReq as Request, mockRes as Response);
 
       expect(mockRes.status).toHaveBeenCalledWith(404);
+    });
+
+    it('debe retornar 502 si no se pudo enviar el correo', async () => {
+      mockReq = { body: { correo: 'ana@test.com' } };
+      reenviarCodigoUseCase.ejecutar.mockRejectedValue(new EmailNoEnviadoException());
+
+      await controller.reenviarCodigo(mockReq as Request, mockRes as Response);
+
+      expect(mockRes.status).toHaveBeenCalledWith(502);
     });
   });
 

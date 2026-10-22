@@ -4,6 +4,7 @@ import { Paciente } from "../../../src/domain/entity/Paciente";
 import { Genero } from "../../../src/domain/enum/Genero";
 import { Rol } from "../../../src/domain/enum/Rol";
 import { DetalleCitaPacienteDTO } from "../../../src/application/dto/CitaPacienteDTO";
+import { RegistrarseDTO } from "../../../src/application/dto/AuthDTO";
 
 // ─── Fixtures de Usuario ──────────────────────────────────────────────────────
 
@@ -27,7 +28,9 @@ export const crearUsuarioNoVerificado = (overrides: Partial<Usuario> = {}): Usua
 
 // ─── Fixtures de RegistrarseDTO ───────────────────────────────────────────────
 
-export const crearRegistrarseDTO = () => ({
+export const crearRegistrarseDTO = (
+  overrides: Partial<RegistrarseDTO> = {}
+): RegistrarseDTO => ({
   nombres: "Ana",
   apellidos: "García",
   correo: "ana@example.com",
@@ -37,6 +40,7 @@ export const crearRegistrarseDTO = () => ({
   genero: Genero.FEMENINO,
   fecha_nacimiento: new Date("1995-05-20"),
   rol: Rol.PACIENTE,
+  ...overrides,
 });
 
 // ─── Fixtures de CodigoVerificacion ──────────────────────────────────────────

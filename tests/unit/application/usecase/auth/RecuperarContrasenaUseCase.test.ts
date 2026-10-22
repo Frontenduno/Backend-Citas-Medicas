@@ -6,6 +6,7 @@ import {
   crearMockCodigoVerificacionRepository,
   crearMockUsuarioRepository,
   crearMockPasswordHasher,
+  crearMockTransactionManager,
 } from "../../../helpers/mocks";
 import {
   crearUsuarioVerificado,
@@ -27,13 +28,20 @@ describe("RecuperarContrasenaUseCase", () => {
   let codigoRepo: ReturnType<typeof crearMockCodigoVerificacionRepository>;
   let usuarioRepo: ReturnType<typeof crearMockUsuarioRepository>;
   let passwordHasher: ReturnType<typeof crearMockPasswordHasher>;
+  let transactionManager: ReturnType<typeof crearMockTransactionManager>;
   let useCase: RecuperarContrasenaUseCase;
 
   beforeEach(() => {
     codigoRepo = crearMockCodigoVerificacionRepository();
     usuarioRepo = crearMockUsuarioRepository();
     passwordHasher = crearMockPasswordHasher();
-    useCase = new RecuperarContrasenaUseCase(codigoRepo, usuarioRepo, passwordHasher);
+    transactionManager = crearMockTransactionManager();
+    useCase = new RecuperarContrasenaUseCase(
+      codigoRepo,
+      usuarioRepo,
+      passwordHasher,
+      transactionManager
+    );
   });
 
   // ─── Casos de éxito ─────────────────────────────────────────────────────────
@@ -58,6 +66,7 @@ describe("RecuperarContrasenaUseCase", () => {
       await useCase.ejecutar(DTO_VALIDO);
 
       // Assert
+      expect(transactionManager.ejecutar).toHaveBeenCalledTimes(1);
       expect(codigoRepo.findByCorreoYCodigo).toHaveBeenCalledWith(
         DTO_VALIDO.correo,
         DTO_VALIDO.codigo

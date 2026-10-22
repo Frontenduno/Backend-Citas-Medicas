@@ -2,6 +2,8 @@ import { RefrescarTokenUseCase } from '../../../src/application/usecase/auth/Ref
 import { PrismaRefreshTokenRepository } from '../../../src/infrastructure/repository/PrismaRefreshTokenRepository';
 import { PrismaUsuarioRepository } from '../../../src/infrastructure/repository/PrismaUsuarioRepository';
 import { JsonWebTokenGenerator } from '../../../src/infrastructure/service/JsonWebTokenGenerator';
+import { PrismaTransactionManager } from '../../../src/infrastructure/database/PrismaTransactionManager';
+import { RefreshTokenRepository } from '../../../src/domain/repository/RefreshTokenRepository';
 import { Usuario } from '../../../src/domain/entity/Usuario';
 import { RefreshToken } from '../../../src/domain/entity/RefreshToken';
 import { Rol } from '../../../src/domain/enum/Rol';
@@ -9,14 +11,40 @@ import { Genero } from '../../../src/domain/enum/Genero';
 import { TokenInvalidoException } from '../../../src/application/exception/TokenInvalidoException';
 import { cleanDatabase, disconnectDatabase } from '../helpers/testDb';
 
+class RefreshTokenRepositoryQueFallaAlGuardar implements RefreshTokenRepository {
+  constructor(private readonly real: RefreshTokenRepository) {}
+
+  async save(_refreshToken: RefreshToken): Promise<RefreshToken> {
+    throw new Error('Fallo simulado al guardar el token');
+  }
+
+  findByToken(token: string) {
+    return this.real.findByToken(token);
+  }
+
+  revokeByToken(token: string) {
+    return this.real.revokeByToken(token);
+  }
+
+  revokeAllByUsuario(idUsuario: number) {
+    return this.real.revokeAllByUsuario(idUsuario);
+  }
+
+  deleteByToken(token: string) {
+    return this.real.deleteByToken(token);
+  }
+}
+
 describe('RefrescarTokenUseCase Integration Tests', () => {
   const usuarioRepository = new PrismaUsuarioRepository();
   const refreshTokenRepository = new PrismaRefreshTokenRepository();
   const jwtGenerator = new JsonWebTokenGenerator('integration-secret', '15m');
+  const transactionManager = new PrismaTransactionManager();
   const useCase = new RefrescarTokenUseCase(
     refreshTokenRepository,
     usuarioRepository,
-    jwtGenerator
+    jwtGenerator,
+    transactionManager
   );
 
   beforeAll(async () => {
@@ -103,5 +131,40 @@ describe('RefrescarTokenUseCase Integration Tests', () => {
     );
 
     await expect(useCase.ejecutar(revokedToken)).rejects.toThrow(TokenInvalidoException);
+  });
+
+  it('debe revertir la revocación del token anterior si falla el guardado del nuevo', async () => {
+    const usuario = await seedUsuario('refresh_rollback@test.com');
+    const payload = {
+      correo: usuario.correo,
+      idUsuario: usuario.idUsuario.toString(),
+      rol: usuario.rol,
+    };
+    const oldRefreshToken = await jwtGenerator.generarRefreshToken(payload);
+    await refreshTokenRepository.save(
+      new RefreshToken(
+        0,
+        oldRefreshToken,
+        usuario.idUsuario,
+        new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        false
+      )
+    );
+
+    const failingUseCase = new RefrescarTokenUseCase(
+      new RefreshTokenRepositoryQueFallaAlGuardar(refreshTokenRepository),
+      usuarioRepository,
+      jwtGenerator,
+      transactionManager
+    );
+
+    await expect(failingUseCase.ejecutar(oldRefreshToken)).rejects.toThrow(
+      'Fallo simulado al guardar el token'
+    );
+
+    // El token anterior no debe quedar revocado si la rotación falla
+    const oldDb = await refreshTokenRepository.findByToken(oldRefreshToken);
+    expect(oldDb?.revocado).toBe(false);
+    expect(oldDb?.esValido()).toBe(true);
   });
 });

@@ -7,6 +7,7 @@ import { JwtGenerator } from "../../../src/application/port/JwtGenerator";
 import { EmailSender } from "../../../src/application/port/EmailSender";
 import { CodeGenerator } from "../../../src/application/port/CodeGenerator";
 import { CitaPacienteQueryPort } from "../../../src/application/port/CitaPacienteQueryPort";
+import { TransactionManager } from "../../../src/application/port/TransactionManager";
 
 // ─── Mock UsuarioRepository ───────────────────────────────────────────────────
 
@@ -84,3 +85,11 @@ export const crearMockCitaPacienteQueryPort =
   (): jest.Mocked<CitaPacienteQueryPort> => ({
     listarCitasPaciente: jest.fn(),
   });
+
+// ─── Mock TransactionManager ──────────────────────────────────────────────────
+
+export const crearMockTransactionManager = (): jest.Mocked<TransactionManager> => {
+  // Por defecto ejecuta la operación recibida, simulando una transacción exitosa.
+  const ejecutar = jest.fn((operacion: () => Promise<unknown>) => operacion());
+  return { ejecutar } as unknown as jest.Mocked<TransactionManager>;
+};

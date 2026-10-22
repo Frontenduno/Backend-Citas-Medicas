@@ -1,17 +1,19 @@
 import { UsuarioRepository } from '../../domain/repository/UsuarioRepository';
 import { Usuario } from '../../domain/entity/Usuario';
-import { prisma } from '../database/prisma';
+import { getPrismaClient } from '../database/prisma';
 import { UsuarioMapper } from '../mappers/UsuarioMapper';
 
 export class PrismaUsuarioRepository implements UsuarioRepository {
   async save(usuario: Usuario): Promise<Usuario> {
+    const db = getPrismaClient();
     const data = UsuarioMapper.toPrisma(usuario);
-    const created = await prisma.usuario.create({ data });
+    const created = await db.usuario.create({ data });
     return UsuarioMapper.toDomain(created);
   }
 
   async update(id: number, usuario: Partial<Usuario>): Promise<Usuario> {
-    const updated = await prisma.usuario.update({
+    const db = getPrismaClient();
+    const updated = await db.usuario.update({
       where: { idUsuario: id },
       data: {
         ...(usuario.nombres && { nombres: usuario.nombres }),
@@ -31,29 +33,34 @@ export class PrismaUsuarioRepository implements UsuarioRepository {
   }
 
   async delete(id: number): Promise<void> {
-    await prisma.usuario.delete({ where: { idUsuario: id } });
+    const db = getPrismaClient();
+    await db.usuario.delete({ where: { idUsuario: id } });
   }
 
   async findById(id: number): Promise<Usuario | null> {
-    const record = await prisma.usuario.findUnique({ where: { idUsuario: id } });
+    const db = getPrismaClient();
+    const record = await db.usuario.findUnique({ where: { idUsuario: id } });
     if (!record) return null;
     return UsuarioMapper.toDomain(record);
   }
 
   async findByCorreo(correo: string): Promise<Usuario | null> {
-    const record = await prisma.usuario.findUnique({ where: { correo } });
+    const db = getPrismaClient();
+    const record = await db.usuario.findUnique({ where: { correo } });
     if (!record) return null;
     return UsuarioMapper.toDomain(record);
   }
 
   async findByDocumento(documento: string): Promise<Usuario | null> {
-    const record = await prisma.usuario.findUnique({ where: { documento_identidad: documento } });
+    const db = getPrismaClient();
+    const record = await db.usuario.findUnique({ where: { documento_identidad: documento } });
     if (!record) return null;
     return UsuarioMapper.toDomain(record);
   }
 
   async findAll(): Promise<Usuario[]> {
-    const records = await prisma.usuario.findMany();
+    const db = getPrismaClient();
+    const records = await db.usuario.findMany();
     return records.map(UsuarioMapper.toDomain);
   }
 }

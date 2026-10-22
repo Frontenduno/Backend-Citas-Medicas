@@ -5,20 +5,24 @@ import { CodigoExpiradoException } from "../../exception/CodigoExpiradoException
 import { CodigoInvalidoException } from "../../exception/CodigoInvalidoException";
 import { UsuarioNoEncontradoException } from "../../exception/UsuarioNoEncontradoException";
 import { PasswordHasher } from "../../port/PasswordHasher";
+import { TransactionManager } from "../../port/TransactionManager";
 
 export class RecuperarContrasenaUseCase {
     private readonly codigoVerificacionRepository: CodigoVerificacionRepository;
     private readonly usuarioRepository: UsuarioRepository;
     private readonly passwordHasher: PasswordHasher;
+    private readonly transactionManager: TransactionManager;
 
     constructor(
         codigoVerificacionRepository: CodigoVerificacionRepository,
         usuarioRepository: UsuarioRepository,
-        passwordHasher: PasswordHasher
+        passwordHasher: PasswordHasher,
+        transactionManager: TransactionManager
     ) {
         this.codigoVerificacionRepository = codigoVerificacionRepository;
         this.usuarioRepository = usuarioRepository;
         this.passwordHasher = passwordHasher;
+        this.transactionManager = transactionManager;
     }
 
     async ejecutar(data: RecuperarContrasenaDTO): Promise<void> {
@@ -42,8 +46,10 @@ export class RecuperarContrasenaUseCase {
 
         const contrasenaHasheada = await this.passwordHasher.hashearContrasena(data.nuevaContrasena);
 
-        await this.usuarioRepository.update(usuario.idUsuario, { contrasena: contrasenaHasheada });
-
-        await this.codigoVerificacionRepository.deleteByCorreo(data.correo);
+        // Actualizar la contraseña y consumir el código deben ocurrir juntos.
+        await this.transactionManager.ejecutar(async () => {
+            await this.usuarioRepository.update(usuario.idUsuario, { contrasena: contrasenaHasheada });
+            await this.codigoVerificacionRepository.deleteByCorreo(data.correo);
+        });
     }
 }

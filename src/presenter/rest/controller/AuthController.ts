@@ -12,6 +12,7 @@ import { RegistrarseDTO } from '../../../application/dto/AuthDTO';
 import { BaseException } from '../../../application/exception/BaseException';
 import { CredencialesIncorrectasException } from '../../../application/exception/CredencialesIncorrectasException';
 import { CorreoNoVerificadoException } from '../../../application/exception/CorreoNoVerificadoException';
+import { EmailNoEnviadoException } from '../../../application/exception/EmailNoEnviadoException';
 import { UsuarioNoEncontradoException } from '../../../application/exception/UsuarioNoEncontradoException';
 import { UsuarioYaExisteException } from '../../../application/exception/UsuarioYaExisteException';
 import { UsuarioYaVerificadoException } from '../../../application/exception/UsuarioYaVerificadoException';
@@ -271,6 +272,9 @@ export class AuthController {
     }
     if (error instanceof UsuarioYaExisteException) {
       return res.status(409).json({ message: error.message });
+    }
+    if (error instanceof EmailNoEnviadoException) {
+      return res.status(502).json({ message: error.message });
     }
     if (
       error instanceof CodigoInvalidoException ||

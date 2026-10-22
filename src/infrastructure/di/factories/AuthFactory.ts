@@ -13,6 +13,7 @@ import { PrismaUsuarioRepository } from '../../repository/PrismaUsuarioRepositor
 import { PrismaPacienteRepository } from '../../repository/PrismaPacienteRepository';
 import { PrismaCodigoVerificacionRepository } from '../../repository/PrismaCodigoVerificacionRepository';
 import { PrismaRefreshTokenRepository } from '../../repository/PrismaRefreshTokenRepository';
+import { PrismaTransactionManager } from '../../database/PrismaTransactionManager';
 import { SharedContainer } from '../SharedContainer';
 
 export class AuthFactory {
@@ -22,6 +23,7 @@ export class AuthFactory {
     const pacienteRepository = new PrismaPacienteRepository();
     const codigoRepository = new PrismaCodigoVerificacionRepository();
     const refreshTokenRepository = new PrismaRefreshTokenRepository();
+    const transactionManager = new PrismaTransactionManager();
 
     // 2. Servicios de infraestructura compartidos
     const passwordHasher = SharedContainer.passwordHasher;
@@ -36,12 +38,14 @@ export class AuthFactory {
       passwordHasher,
       emailSender,
       codeGenerator,
-      pacienteRepository
+      pacienteRepository,
+      transactionManager
     );
 
     const verificarCodigoUseCase = new VerificarCodigoUseCase(
       codigoRepository,
-      usuarioRepository
+      usuarioRepository,
+      transactionManager
     );
 
     const iniciarSesionUseCase = new IniciarSesionUseCase(
@@ -54,27 +58,31 @@ export class AuthFactory {
     const refrescarTokenUseCase = new RefrescarTokenUseCase(
       refreshTokenRepository,
       usuarioRepository,
-      jwtGenerator
+      jwtGenerator,
+      transactionManager
     );
 
     const reenviarCodigoUseCase = new ReenviarCodigoUseCase(
       usuarioRepository,
       codigoRepository,
       codeGenerator,
-      emailSender
+      emailSender,
+      transactionManager
     );
 
     const solicitarRecuperacionUseCase = new SolicitarRecuperacionUseCase(
       usuarioRepository,
       codigoRepository,
       codeGenerator,
-      emailSender
+      emailSender,
+      transactionManager
     );
 
     const recuperarContrasenaUseCase = new RecuperarContrasenaUseCase(
       codigoRepository,
       usuarioRepository,
-      passwordHasher
+      passwordHasher,
+      transactionManager
     );
 
     // 4. Controlador ensamblado

@@ -1,6 +1,8 @@
 import { RecuperarContrasenaUseCase } from '../../../src/application/usecase/auth/RecuperarContrasenaUseCase';
 import { PrismaUsuarioRepository } from '../../../src/infrastructure/repository/PrismaUsuarioRepository';
 import { PrismaCodigoVerificacionRepository } from '../../../src/infrastructure/repository/PrismaCodigoVerificacionRepository';
+import { PrismaTransactionManager } from '../../../src/infrastructure/database/PrismaTransactionManager';
+import { CodigoVerificacionRepository } from '../../../src/domain/repository/CodigoVerificacionRepository';
 import { BcryptPasswordHasher } from '../../../src/infrastructure/service/BcryptPasswordHasher';
 import { Usuario } from '../../../src/domain/entity/Usuario';
 import { CodigoVerificacion } from '../../../src/domain/entity/CodigoVerificacion';
@@ -10,14 +12,32 @@ import { CodigoInvalidoException } from '../../../src/application/exception/Codi
 import { CodigoExpiradoException } from '../../../src/application/exception/CodigoExpiradoException';
 import { cleanDatabase, disconnectDatabase } from '../helpers/testDb';
 
+class CodigoRepositoryQueFallaAlEliminar implements CodigoVerificacionRepository {
+  constructor(private readonly real: CodigoVerificacionRepository) {}
+
+  save(codigo: CodigoVerificacion) {
+    return this.real.save(codigo);
+  }
+
+  findByCorreoYCodigo(correo: string, codigo: string) {
+    return this.real.findByCorreoYCodigo(correo, codigo);
+  }
+
+  async deleteByCorreo(): Promise<void> {
+    throw new Error('Fallo simulado al eliminar el código');
+  }
+}
+
 describe('RecuperarContrasenaUseCase Integration Tests', () => {
   const usuarioRepository = new PrismaUsuarioRepository();
   const codigoRepository = new PrismaCodigoVerificacionRepository();
   const passwordHasher = new BcryptPasswordHasher();
+  const transactionManager = new PrismaTransactionManager();
   const useCase = new RecuperarContrasenaUseCase(
     codigoRepository,
     usuarioRepository,
-    passwordHasher
+    passwordHasher,
+    transactionManager
   );
 
   beforeAll(async () => {
@@ -112,5 +132,35 @@ describe('RecuperarContrasenaUseCase Integration Tests', () => {
         nuevaContrasena: 'NewPassword!',
       })
     ).rejects.toThrow(CodigoExpiradoException);
+  });
+
+  it('debe revertir el cambio de contraseña si falla el borrado del código', async () => {
+    const correo = 'reset_rollback@test.com';
+    const codigo = '777888';
+    const oldPassword = 'OldPassword123!';
+    const user = await seedUsuarioYCodigo(correo, codigo, oldPassword);
+
+    const failingUseCase = new RecuperarContrasenaUseCase(
+      new CodigoRepositoryQueFallaAlEliminar(codigoRepository),
+      usuarioRepository,
+      passwordHasher,
+      transactionManager
+    );
+
+    await expect(
+      failingUseCase.ejecutar({
+        correo,
+        codigo,
+        nuevaContrasena: 'NewPassword456!',
+      })
+    ).rejects.toThrow('Fallo simulado al eliminar el código');
+
+    const userDb = await usuarioRepository.findById(user.idUsuario);
+    const oldMatches = await passwordHasher.compararContrasena(
+      oldPassword,
+      userDb!.contrasena
+    );
+    expect(oldMatches).toBe(true);
+    expect(await codigoRepository.findByCorreoYCodigo(correo, codigo)).not.toBeNull();
   });
 });

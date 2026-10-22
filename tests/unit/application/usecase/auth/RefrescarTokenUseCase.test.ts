@@ -5,6 +5,7 @@ import {
   crearMockUsuarioRepository,
   crearMockJwtGenerator,
   crearMockRefreshTokenRepository,
+  crearMockTransactionManager,
 } from '../../../helpers/mocks';
 import { crearUsuarioVerificado, crearUsuarioNoVerificado } from '../../../helpers/fixtures';
 
@@ -12,6 +13,7 @@ describe('RefrescarTokenUseCase Unit Tests', () => {
   let refreshTokenRepo: ReturnType<typeof crearMockRefreshTokenRepository>;
   let usuarioRepo: ReturnType<typeof crearMockUsuarioRepository>;
   let jwtGenerator: ReturnType<typeof crearMockJwtGenerator>;
+  let transactionManager: ReturnType<typeof crearMockTransactionManager>;
   let useCase: RefrescarTokenUseCase;
 
   const TOKEN_VALIDO = 'valid.refresh.token';
@@ -22,7 +24,13 @@ describe('RefrescarTokenUseCase Unit Tests', () => {
     refreshTokenRepo = crearMockRefreshTokenRepository();
     usuarioRepo = crearMockUsuarioRepository();
     jwtGenerator = crearMockJwtGenerator();
-    useCase = new RefrescarTokenUseCase(refreshTokenRepo, usuarioRepo, jwtGenerator);
+    transactionManager = crearMockTransactionManager();
+    useCase = new RefrescarTokenUseCase(
+      refreshTokenRepo,
+      usuarioRepo,
+      jwtGenerator,
+      transactionManager
+    );
   });
 
   it('debe renovar exitosamente los tokens, revocar el anterior y persistir el nuevo', async () => {
@@ -54,6 +62,7 @@ describe('RefrescarTokenUseCase Unit Tests', () => {
     });
     expect(refreshTokenRepo.revokeByToken).toHaveBeenCalledWith(TOKEN_VALIDO);
     expect(refreshTokenRepo.save).toHaveBeenCalled();
+    expect(transactionManager.ejecutar).toHaveBeenCalledTimes(1);
   });
 
   it('debe lanzar TokenInvalidoException si el token no viene proporcionado', async () => {

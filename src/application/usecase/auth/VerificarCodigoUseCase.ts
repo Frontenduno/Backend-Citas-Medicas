@@ -4,17 +4,21 @@ import { VerificarCodigoDTO } from "../../dto/AuthDTO";
 import { CodigoExpiradoException } from "../../exception/CodigoExpiradoException";
 import { CodigoInvalidoException } from "../../exception/CodigoInvalidoException";
 import { UsuarioNoEncontradoException } from "../../exception/UsuarioNoEncontradoException";
+import { TransactionManager } from "../../port/TransactionManager";
 
 export class VerificarCodigoUseCase {
     private readonly codigoVerificacionRepository: CodigoVerificacionRepository;
     private readonly usuarioRepository: UsuarioRepository;
+    private readonly transactionManager: TransactionManager;
 
     constructor(
         codigoVerificacionRepository: CodigoVerificacionRepository,
-        usuarioRepository: UsuarioRepository
+        usuarioRepository: UsuarioRepository,
+        transactionManager: TransactionManager
     ) {
         this.codigoVerificacionRepository = codigoVerificacionRepository;
         this.usuarioRepository = usuarioRepository;
+        this.transactionManager = transactionManager;
     }
 
     async ejecutar(data: VerificarCodigoDTO): Promise<void> {
@@ -36,8 +40,10 @@ export class VerificarCodigoUseCase {
             throw new UsuarioNoEncontradoException();
         }
 
-        await this.usuarioRepository.update(usuario.idUsuario, { verificado: true });
-
-        await this.codigoVerificacionRepository.deleteByCorreo(data.correo);
+        // Marcar como verificado y consumir el código deben ocurrir juntos.
+        await this.transactionManager.ejecutar(async () => {
+            await this.usuarioRepository.update(usuario.idUsuario, { verificado: true });
+            await this.codigoVerificacionRepository.deleteByCorreo(data.correo);
+        });
     }
 }

@@ -1,11 +1,13 @@
 import { SolicitarRecuperacionUseCase } from "../../../../../src/application/usecase/auth/SolicitarRecuperacionUseCase";
 import { UsuarioNoEncontradoException } from "../../../../../src/application/exception/UsuarioNoEncontradoException";
 import { CorreoNoVerificadoException } from "../../../../../src/application/exception/CorreoNoVerificadoException";
+import { EmailNoEnviadoException } from "../../../../../src/application/exception/EmailNoEnviadoException";
 import {
   crearMockUsuarioRepository,
   crearMockCodigoVerificacionRepository,
   crearMockCodeGenerator,
   crearMockEmailSender,
+  crearMockTransactionManager,
 } from "../../../helpers/mocks";
 import {
   crearUsuarioVerificado,
@@ -25,6 +27,7 @@ describe("SolicitarRecuperacionUseCase", () => {
   let codigoRepo: ReturnType<typeof crearMockCodigoVerificacionRepository>;
   let codeGenerator: ReturnType<typeof crearMockCodeGenerator>;
   let emailSender: ReturnType<typeof crearMockEmailSender>;
+  let transactionManager: ReturnType<typeof crearMockTransactionManager>;
   let useCase: SolicitarRecuperacionUseCase;
 
   beforeEach(() => {
@@ -32,11 +35,13 @@ describe("SolicitarRecuperacionUseCase", () => {
     codigoRepo = crearMockCodigoVerificacionRepository();
     codeGenerator = crearMockCodeGenerator();
     emailSender = crearMockEmailSender();
+    transactionManager = crearMockTransactionManager();
     useCase = new SolicitarRecuperacionUseCase(
       usuarioRepo,
       codigoRepo,
       codeGenerator,
-      emailSender
+      emailSender,
+      transactionManager
     );
   });
 
@@ -57,6 +62,7 @@ describe("SolicitarRecuperacionUseCase", () => {
       await useCase.ejecutar(DTO_VALIDO);
 
       // Assert
+      expect(transactionManager.ejecutar).toHaveBeenCalledTimes(1);
       expect(codigoRepo.deleteByCorreo).toHaveBeenCalledWith(DTO_VALIDO.correo);
       expect(codeGenerator.generateCode).toHaveBeenCalledTimes(1);
       expect(codigoRepo.save).toHaveBeenCalledWith(
@@ -113,6 +119,19 @@ describe("SolicitarRecuperacionUseCase", () => {
       await expect(useCase.ejecutar(DTO_VALIDO)).rejects.toThrow(CorreoNoVerificadoException);
       expect(codigoRepo.deleteByCorreo).not.toHaveBeenCalled();
       expect(emailSender.enviarEmail).not.toHaveBeenCalled();
+    });
+
+    it("debe lanzar EmailNoEnviadoException si falla el envío del correo", async () => {
+      // Arrange
+      const usuario = crearUsuarioVerificado({ correo: DTO_VALIDO.correo });
+      usuarioRepo.findByCorreo.mockResolvedValue(usuario);
+      codigoRepo.deleteByCorreo.mockResolvedValue(undefined);
+      codeGenerator.generateCode.mockReturnValue(CODIGO_RECUPERACION);
+      codigoRepo.save.mockResolvedValue({} as CodigoVerificacion);
+      emailSender.enviarEmail.mockRejectedValue(new Error("SMTP no disponible"));
+
+      // Act & Assert
+      await expect(useCase.ejecutar(DTO_VALIDO)).rejects.toThrow(EmailNoEnviadoException);
     });
   });
 });

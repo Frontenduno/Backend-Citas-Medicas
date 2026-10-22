@@ -1,6 +1,8 @@
 import { VerificarCodigoUseCase } from '../../../src/application/usecase/auth/VerificarCodigoUseCase';
 import { PrismaUsuarioRepository } from '../../../src/infrastructure/repository/PrismaUsuarioRepository';
 import { PrismaCodigoVerificacionRepository } from '../../../src/infrastructure/repository/PrismaCodigoVerificacionRepository';
+import { PrismaTransactionManager } from '../../../src/infrastructure/database/PrismaTransactionManager';
+import { CodigoVerificacionRepository } from '../../../src/domain/repository/CodigoVerificacionRepository';
 import { Usuario } from '../../../src/domain/entity/Usuario';
 import { CodigoVerificacion } from '../../../src/domain/entity/CodigoVerificacion';
 import { Rol } from '../../../src/domain/enum/Rol';
@@ -9,10 +11,31 @@ import { CodigoInvalidoException } from '../../../src/application/exception/Codi
 import { CodigoExpiradoException } from '../../../src/application/exception/CodigoExpiradoException';
 import { cleanDatabase, disconnectDatabase } from '../helpers/testDb';
 
+class CodigoRepositoryQueFallaAlEliminar implements CodigoVerificacionRepository {
+  constructor(private readonly real: CodigoVerificacionRepository) {}
+
+  save(codigo: CodigoVerificacion) {
+    return this.real.save(codigo);
+  }
+
+  findByCorreoYCodigo(correo: string, codigo: string) {
+    return this.real.findByCorreoYCodigo(correo, codigo);
+  }
+
+  async deleteByCorreo(): Promise<void> {
+    throw new Error('Fallo simulado al eliminar el código');
+  }
+}
+
 describe('VerificarCodigoUseCase Integration Tests', () => {
   const usuarioRepository = new PrismaUsuarioRepository();
   const codigoRepository = new PrismaCodigoVerificacionRepository();
-  const useCase = new VerificarCodigoUseCase(codigoRepository, usuarioRepository);
+  const transactionManager = new PrismaTransactionManager();
+  const useCase = new VerificarCodigoUseCase(
+    codigoRepository,
+    usuarioRepository,
+    transactionManager
+  );
 
   beforeAll(async () => {
     await cleanDatabase();
@@ -84,5 +107,25 @@ describe('VerificarCodigoUseCase Integration Tests', () => {
     await expect(useCase.ejecutar({ correo, codigo: '111222' })).rejects.toThrow(
       CodigoExpiradoException
     );
+  });
+
+  it('debe revertir la verificación del usuario si falla el borrado del código', async () => {
+    const correo = 'verify_rollback@test.com';
+    const codigo = '777888';
+    const user = await seedUsuarioYCodigo(correo, codigo);
+
+    const failingUseCase = new VerificarCodigoUseCase(
+      new CodigoRepositoryQueFallaAlEliminar(codigoRepository),
+      usuarioRepository,
+      transactionManager
+    );
+
+    await expect(failingUseCase.ejecutar({ correo, codigo })).rejects.toThrow(
+      'Fallo simulado al eliminar el código'
+    );
+
+    const userDb = await usuarioRepository.findById(user.idUsuario);
+    expect(userDb?.verificado).toBe(false);
+    expect(await codigoRepository.findByCorreoYCodigo(correo, codigo)).not.toBeNull();
   });
 });

@@ -5,6 +5,7 @@ import { UsuarioNoEncontradoException } from "../../../../../src/application/exc
 import {
   crearMockCodigoVerificacionRepository,
   crearMockUsuarioRepository,
+  crearMockTransactionManager,
 } from "../../../helpers/mocks";
 import {
   crearUsuarioVerificado,
@@ -24,12 +25,14 @@ const DTO_VALIDO = {
 describe("VerificarCodigoUseCase", () => {
   let codigoRepo: ReturnType<typeof crearMockCodigoVerificacionRepository>;
   let usuarioRepo: ReturnType<typeof crearMockUsuarioRepository>;
+  let transactionManager: ReturnType<typeof crearMockTransactionManager>;
   let useCase: VerificarCodigoUseCase;
 
   beforeEach(() => {
     codigoRepo = crearMockCodigoVerificacionRepository();
     usuarioRepo = crearMockUsuarioRepository();
-    useCase = new VerificarCodigoUseCase(codigoRepo, usuarioRepo);
+    transactionManager = crearMockTransactionManager();
+    useCase = new VerificarCodigoUseCase(codigoRepo, usuarioRepo, transactionManager);
   });
 
   // ─── Casos de éxito ─────────────────────────────────────────────────────────
@@ -49,6 +52,7 @@ describe("VerificarCodigoUseCase", () => {
       await useCase.ejecutar(DTO_VALIDO);
 
       // Assert
+      expect(transactionManager.ejecutar).toHaveBeenCalledTimes(1);
       expect(codigoRepo.findByCorreoYCodigo).toHaveBeenCalledWith(
         DTO_VALIDO.correo,
         DTO_VALIDO.codigo

@@ -2,18 +2,23 @@ import { SolicitarRecuperacionUseCase } from '../../../src/application/usecase/a
 import { PrismaUsuarioRepository } from '../../../src/infrastructure/repository/PrismaUsuarioRepository';
 import { PrismaCodigoVerificacionRepository } from '../../../src/infrastructure/repository/PrismaCodigoVerificacionRepository';
 import { RandomCodeGenerator } from '../../../src/infrastructure/service/RandomCodeGenerator';
+import { PrismaTransactionManager } from '../../../src/infrastructure/database/PrismaTransactionManager';
+import { prisma } from '../../../src/infrastructure/database/prisma';
+import { CodigoVerificacion } from '../../../src/domain/entity/CodigoVerificacion';
 import { EmailSender } from '../../../src/application/port/EmailSender';
 import { Usuario } from '../../../src/domain/entity/Usuario';
 import { Rol } from '../../../src/domain/enum/Rol';
 import { Genero } from '../../../src/domain/enum/Genero';
 import { UsuarioNoEncontradoException } from '../../../src/application/exception/UsuarioNoEncontradoException';
 import { CorreoNoVerificadoException } from '../../../src/application/exception/CorreoNoVerificadoException';
+import { EmailNoEnviadoException } from '../../../src/application/exception/EmailNoEnviadoException';
 import { cleanDatabase, disconnectDatabase } from '../helpers/testDb';
 
 describe('SolicitarRecuperacionUseCase Integration Tests', () => {
   const usuarioRepository = new PrismaUsuarioRepository();
   const codigoRepository = new PrismaCodigoVerificacionRepository();
   const codeGenerator = new RandomCodeGenerator();
+  const transactionManager = new PrismaTransactionManager();
   let emailSender: EmailSender;
   let useCase: SolicitarRecuperacionUseCase;
 
@@ -30,7 +35,8 @@ describe('SolicitarRecuperacionUseCase Integration Tests', () => {
       usuarioRepository,
       codigoRepository,
       codeGenerator,
-      emailSender
+      emailSender,
+      transactionManager
     );
   });
 
@@ -86,5 +92,22 @@ describe('SolicitarRecuperacionUseCase Integration Tests', () => {
     await seedUsuario(correo, false);
 
     await expect(useCase.ejecutar({ correo })).rejects.toThrow(CorreoNoVerificadoException);
+  });
+
+  it('debe conservar el código anterior si falla el envío del correo', async () => {
+    const correo = 'recovery_fail@test.com';
+    await seedUsuario(correo, true);
+    await codigoRepository.save(
+      new CodigoVerificacion(0, correo, '111111', new Date(Date.now() + 5 * 60 * 1000))
+    );
+
+    (emailSender.enviarEmail as jest.Mock).mockRejectedValueOnce(
+      new Error('SMTP no disponible')
+    );
+
+    await expect(useCase.ejecutar({ correo })).rejects.toThrow(EmailNoEnviadoException);
+
+    expect(await codigoRepository.findByCorreoYCodigo(correo, '111111')).not.toBeNull();
+    expect(await prisma.codigoVerificacion.count({ where: { correo } })).toBe(1);
   });
 });

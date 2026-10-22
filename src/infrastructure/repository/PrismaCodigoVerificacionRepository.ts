@@ -1,17 +1,19 @@
 import { CodigoVerificacionRepository } from '../../domain/repository/CodigoVerificacionRepository';
 import { CodigoVerificacion } from '../../domain/entity/CodigoVerificacion';
-import { prisma } from '../database/prisma';
+import { getPrismaClient } from '../database/prisma';
 import { CodigoVerificacionMapper } from '../mappers/CodigoVerificacionMapper';
 
 export class PrismaCodigoVerificacionRepository implements CodigoVerificacionRepository {
   async save(codigo: CodigoVerificacion): Promise<CodigoVerificacion> {
+    const db = getPrismaClient();
     const data = CodigoVerificacionMapper.toPrisma(codigo);
-    const created = await prisma.codigoVerificacion.create({ data });
+    const created = await db.codigoVerificacion.create({ data });
     return CodigoVerificacionMapper.toDomain(created);
   }
 
   async findByCorreoYCodigo(correo: string, codigo: string): Promise<CodigoVerificacion | null> {
-    const record = await prisma.codigoVerificacion.findFirst({
+    const db = getPrismaClient();
+    const record = await db.codigoVerificacion.findFirst({
       where: { correo, codigo },
       orderBy: { created_at: 'desc' },
     });
@@ -20,6 +22,7 @@ export class PrismaCodigoVerificacionRepository implements CodigoVerificacionRep
   }
 
   async deleteByCorreo(correo: string): Promise<void> {
-    await prisma.codigoVerificacion.deleteMany({ where: { correo } });
+    const db = getPrismaClient();
+    await db.codigoVerificacion.deleteMany({ where: { correo } });
   }
 }
